@@ -1,635 +1,416 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#101827" />
-  <title>Калькулятор LDP / IMU</title>
-  <style>
-    :root {
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --panel-soft: #f8fafc;
-      --line: #e6eaf0;
-      --line-strong: #d8dee8;
-      --text: #111827;
-      --muted: #667085;
-      --muted-2: #98a2b3;
-      --navy: #111827;
-      --violet: #6d4aff;
-      --violet-2: #4f46e5;
-      --green: #12b76a;
-      --green-soft: #ecfdf3;
-      --grey-soft: #f2f4f7;
-      --shadow: 0 10px 30px rgba(16, 24, 40, 0.06);
-      --shadow-soft: 0 3px 10px rgba(16, 24, 40, 0.05);
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>РљР°Р»СЊРєСѓР»СЏС‚РѕСЂ LDP / RRP / IMU вЂ” restored baseline</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
+  --soft:#f8fafc;--violet:#6d28d9;--violet2:#4f46e5;--green:#10b981;--red:#ef4444;
+  --shadow:0 10px 28px rgba(15,23,42,.07)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top{max-width:1160px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:38px;height:38px;border-radius:13px;background:#0f172a;color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800}
+h1{font-size:15px;margin:0;font-weight:800}.sub{font-size:11px;color:var(--muted)}
+.reset{height:38px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:0 13px;color:#334155;font-weight:700}
+main{max-width:1160px;margin:0 auto;padding:16px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px}
+.field{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+.field label{display:block;font-size:12px;color:#64748b;font-weight:800;margin-bottom:8px}
+.wrap{position:relative}
+.field input,.field select{width:100%;height:48px;border:1px solid var(--line);border-radius:13px;background:#f8fafc;text-align:center;font-size:20px;font-weight:900;outline:none;padding:0 58px 0 12px}.field select{padding:0 12px;text-align:left;font-size:16px}
+.field input:focus,.field select:focus{border-color:#a78bfa;box-shadow:0 0 0 4px #ede9fe;background:#fff}
+.suffix{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:900;color:#94a3b8;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.country{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.country-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.country-main{display:flex;align-items:center;gap:10px;min-width:0}
+.flag{width:40px;height:27px;overflow:hidden;border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex:0 0 auto}
+.flag svg{width:100%;height:100%;display:block}
+.name{font-weight:900}.route{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#f1f5f9;border-radius:14px;padding:4px;width:132px}
+.seg button{height:34px;border:0;background:transparent;border-radius:10px;color:#94a3b8;display:grid;place-items:center}
+.seg button.active{background:#fff;color:#111827;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.seg svg{width:16px;height:16px}
+.mid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.duty,.ldp{border-radius:16px;padding:12px;border:1px solid var(--line)}
+.duty{display:flex;align-items:center;justify-content:space-between;background:#ecfdf5;border-color:#bbf7d0}
+.duty.off{background:#f8fafc;border-color:#e2e8f0}
+.duty-title{font-size:13px;font-weight:900}.duty-state{font-size:12px;font-weight:900;color:#047857}.duty.off .duty-state{color:#64748b}
+.switch{width:44px;height:24px;border-radius:999px;background:#cbd5e1;position:relative;transition:.2s}
+.switch::after{content:"";position:absolute;width:18px;height:18px;top:3px;left:3px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:.2s}
+.duty:not(.off) .switch{background:var(--green)}.duty:not(.off) .switch::after{transform:translateX(20px)}
+.eyebrow{font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8}
+.ldp-usd{font-size:20px;font-weight:900;margin-top:4px}.ldp-rub{font-size:12px;color:#64748b;font-weight:700;margin-top:2px}
+.rrp{margin-top:10px;border:1px solid #ddd6fe;border-radius:16px;padding:12px;background:linear-gradient(135deg,#f5f3ff,#eef2ff);display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;width:100%}
+.rrp-main{min-width:0}.rrp-value{font-size:19px;font-weight:900;margin-top:4px}.rrp-sub{font-size:11px;color:#64748b;margin-top:2px}
+.imu{padding:9px 12px;border-radius:999px;background:linear-gradient(90deg,var(--violet),var(--violet2));color:#fff;font-weight:900;min-width:86px;text-align:center}
+.more{font-size:20px;color:#94a3b8}
+details{margin-top:14px}.details-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center}.details-body{padding:14px;border-top:1px solid var(--line);background:#fbfcfe}
+.settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.setting{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}.setting span{font-size:12px;color:#64748b}.setting input{width:110px;height:34px;border:1px solid var(--line);border-radius:9px;padding:0 9px;text-align:right}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.45);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center;padding:12px}
+.overlay.show{display:flex}
+.modal{width:100%;max-width:520px;background:#fff;border-radius:24px 24px 18px 18px;padding:16px;max-height:86vh;overflow:auto;box-shadow:0 24px 60px rgba(15,23,42,.24)}
+.modal-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}
+.modal-title{font-size:16px;font-weight:900}.modal-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.close{width:36px;height:36px;border:0;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:22px}
+.rrp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rrp-option{border:1px solid;border-radius:14px;padding:11px;text-align:left}
+.rrp-option.ok{background:#ecfdf5;border-color:#bbf7d0}.rrp-option.bad{background:#fef2f2;border-color:#fecaca}
+.rrp-option.active{outline:2px solid #7c3aed}
+.rrp-option-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.rrp-price{font-weight:900}
+.badge{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:white;font-size:12px;font-weight:900}.ok .badge{background:#10b981}.bad .badge{background:#ef4444}
+.rrp-imu{font-size:12px;font-weight:900;margin-top:7px}.ok .rrp-imu{color:#047857}.bad .rrp-imu{color:#b91c1c}
 
-    * { box-sizing: border-box; }
-    html { min-width: 320px; background: var(--bg); }
-    body { margin: 0; color: var(--text); background: var(--bg); }
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
+.actions{display:flex;align-items:center;gap:8px}
+.pdf-btn{height:38px;border:0;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;border-radius:12px;padding:0 13px;font-weight:800;box-shadow:0 6px 16px rgba(79,70,229,.2)}
+.pdf-btn:disabled{opacity:.6;cursor:wait}
+.report-form{display:grid;gap:12px}
+.report-label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#475569}
+.report-label textarea,.report-label input[type=file]{width:100%;border:1px solid var(--line);border-radius:12px;background:#f8fafc;padding:10px;font:inherit}
+.report-label textarea{min-height:92px;resize:vertical}
+.report-preview{display:none;max-height:180px;max-width:100%;border-radius:14px;border:1px solid var(--line);object-fit:contain;background:#f8fafc}
+.report-preview.show{display:block}
+.report-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.report-cancel,.report-download{height:40px;border-radius:12px;padding:0 14px;font-weight:800}
+.report-cancel{border:1px solid var(--line);background:#fff;color:#475569}
+.report-download{border:0;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff}
+.report-download:disabled{opacity:.6;cursor:wait}
+.report-status{min-height:18px;font-size:12px;color:#64748b}
 
-    .app-header {
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
 
-    .header-inner,
-    .page {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-    }
+.mode-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px 0}
+.mode-label{font-size:12px;font-weight:800;color:#64748b}
+.mode-switcher{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;border-radius:14px;background:#f1f5f9;padding:4px}
+.mode-btn{height:36px;border:0;border-radius:10px;background:transparent;padding:0 12px;color:#64748b;font-size:12px;font-weight:850}
+.mode-btn.active{background:#fff;color:#111827;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.hidden{display:none!important}
+.reverse-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.reverse-card{border:1px solid #ddd6fe;border-radius:16px;padding:12px;background:linear-gradient(135deg,#f5f3ff,#eef2ff)}
+.reverse-card.fob{border-color:#bfdbfe;background:linear-gradient(135deg,#eff6ff,#eef2ff)}
+.reverse-title{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8}
+.reverse-value{margin-top:4px;font-size:20px;font-weight:900;color:#0f172a}
+.reverse-sub{margin-top:3px;font-size:11px;color:#64748b}
+.reverse-status{margin-top:10px;border-radius:12px;padding:9px 10px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:800}
+.reverse-status.bad{background:#fef2f2;color:#b91c1c}
+@media(max-width:650px){.mode-wrap{align-items:flex-start;flex-direction:column}.mode-switcher{width:100%}.reverse-grid{grid-template-columns:1fr}}
 
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-height: 68px;
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .brand-icon {
-      display: grid;
-      place-items: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 13px;
-      color: #fff;
-      background: var(--navy);
-      box-shadow: 0 8px 18px rgba(17, 24, 39, 0.14);
-    }
-    .brand-title { margin: 0; font-size: 16px; line-height: 1.1; letter-spacing: -0.02em; }
-    .brand-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
-
-    .reset-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 36px;
-      padding: 0 12px;
-      border: 1px solid var(--line-strong);
-      border-radius: 11px;
-      color: #344054;
-      background: #fff;
-      transition: 0.2s ease;
-    }
-    .reset-btn:hover { background: var(--panel-soft); border-color: #cbd5e1; }
-
-    .page { padding: 20px 0 34px; }
-    .stack { display: grid; gap: 16px; }
-
-    .panel {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      background: var(--panel);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 18px 20px 0;
-    }
-    .panel-title { margin: 0; font-size: 16px; letter-spacing: -0.015em; }
-    .panel-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
-
-    .primary-panel { padding: 18px 20px 20px; }
-    .primary-panel .panel-head { padding: 0 0 15px; }
-    .input-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-
-    .input-card {
-      display: block;
-      min-width: 0;
-      padding: 13px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: #fff;
-      transition: 0.2s ease;
-    }
-    .input-card:focus-within {
-      border-color: rgba(109, 74, 255, 0.45);
-      box-shadow: 0 0 0 4px rgba(109, 74, 255, 0.1);
-    }
-    .input-label {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-bottom: 10px;
-      color: #475467;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .input-shell { position: relative; }
-    .main-input {
-      width: 100%;
-      height: 46px;
-      padding: 0 64px 0 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      outline: none;
-      color: var(--text);
-      background: var(--panel-soft);
-      text-align: center;
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      transition: 0.2s ease;
-    }
-    .main-input:focus { border-color: rgba(109, 74, 255, 0.45); background: #fff; }
-    .input-unit {
-      position: absolute;
-      top: 50%;
-      right: 13px;
-      transform: translateY(-50%);
-      color: var(--muted-2);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      pointer-events: none;
-    }
-
-    .country-panel .panel-head { padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-    .desktop-grid-wrap { overflow-x: auto; }
-    .desktop-grid { min-width: 1030px; }
-    .country-grid {
-      display: grid;
-      grid-template-columns: minmax(180px, 1.32fr) minmax(250px, 1.45fr) 126px 114px 114px 102px;
-      gap: 14px;
-      align-items: center;
-    }
-    .country-grid.header {
-      padding: 11px 20px;
-      color: var(--muted-2);
-      background: var(--panel-soft);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-    .country-row {
-      padding: 14px 20px;
-      border-top: 1px solid var(--line);
-      transition: 0.18s ease;
-    }
-    .country-row:first-of-type { border-top: 0; }
-    .country-row:hover { background: #fbfcfe; }
-
-    .country-cell { display: flex; align-items: center; gap: 11px; min-width: 0; }
-    .country-name { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
-    .country-route { margin: 4px 0 0; color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .flag { width: 40px; height: 27px; flex: none; overflow: hidden; border-radius: 6px; box-shadow: 0 1px 4px rgba(16, 24, 40, 0.12); outline: 1px solid rgba(16,24,40,0.08); }
-    .flag.small { width: 30px; height: 20px; border-radius: 4px; }
-
-    .segmented {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 4px;
-      padding: 4px;
-      border-radius: 14px;
-      background: #f1f3f7;
-      box-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.05);
-    }
-    .segment-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-width: 0;
-      height: 35px;
-      border: 0;
-      border-radius: 10px;
-      color: #667085;
-      background: transparent;
-      font-size: 11px;
-      font-weight: 750;
-      transition: 0.18s ease;
-    }
-    .segment-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.62); }
-    .segment-btn.active { color: #fff; background: var(--navy); box-shadow: 0 4px 10px rgba(17, 24, 39, 0.18); }
-
-    .duty-switch {
-      display: inline-flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 7px;
-      width: 118px;
-      height: 36px;
-      padding: 0 9px 0 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: #667085;
-      background: var(--grey-soft);
-      font-size: 11px;
-      font-weight: 800;
-      transition: 0.18s ease;
-    }
-    .duty-switch.on { border-color: #a6f4c5; color: #067647; background: var(--green-soft); }
-    .duty-label { display: inline-flex; align-items: center; gap: 5px; }
-    .toggle-track { position: relative; width: 34px; height: 19px; flex: none; border-radius: 999px; background: #cbd5e1; transition: 0.18s ease; }
-    .duty-switch.on .toggle-track { background: var(--green); }
-    .toggle-knob { position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.18); transition: 0.18s ease; }
-    .duty-switch.on .toggle-knob { transform: translateX(15px); }
-
-    .metric { text-align: right; }
-    .metric-usd { color: var(--text); font-size: 16px; font-weight: 850; letter-spacing: -0.02em; }
-    .metric-rub { color: #475467; font-size: 13px; font-weight: 700; }
-    .imu-badge {
-      display: inline-flex;
-      min-width: 90px;
-      height: 38px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      color: #fff;
-      background: linear-gradient(110deg, #7c3aed, #4f46e5 56%, #2563eb);
-      box-shadow: 0 7px 15px rgba(79, 70, 229, 0.2);
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: -0.01em;
-    }
-
-    .mobile-countries { display: none; }
-    .mobile-card { padding: 15px; border-top: 1px solid var(--line); }
-    .mobile-card:first-child { border-top: 0; }
-    .mobile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .mobile-results { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 11px; }
-    .ldp-card, .imu-card { border-radius: 14px; padding: 11px; }
-    .ldp-card { border: 1px solid var(--line); background: var(--panel-soft); }
-    .imu-card { color: #fff; background: linear-gradient(135deg, #7c3aed, #4f46e5 56%, #2563eb); box-shadow: 0 7px 15px rgba(79, 70, 229, 0.18); }
-    .tiny-caption { color: var(--muted-2); font-size: 9px; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
-    .imu-card .tiny-caption { color: rgba(255,255,255,0.75); }
-    .mobile-value { margin-top: 6px; font-size: 17px; font-weight: 900; letter-spacing: -0.02em; }
-    .mobile-subvalue { margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 650; }
-
-    details.panel summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-    }
-    details.panel summary::-webkit-details-marker { display: none; }
-    .details-title { display: flex; align-items: center; gap: 10px; }
-    .details-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; color: #475467; background: var(--grey-soft); }
-    .details-body { border-top: 1px solid var(--line); padding: 14px; background: #fbfcfe; }
-    .settings-grid { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 12px; }
-    .settings-card { border: 1px solid var(--line); border-radius: 15px; background: #fff; padding: 12px; }
-    .settings-card-title { display: flex; align-items: center; gap: 7px; margin: 0 0 6px; font-size: 12px; }
-    .small-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 41px; border-bottom: 1px solid #eef1f5; }
-    .small-field:last-child { border-bottom: 0; }
-    .small-label { color: #667085; font-size: 12px; }
-    .small-input-shell { position: relative; width: 126px; flex: none; }
-    .small-input { width: 100%; height: 31px; padding: 0 36px 0 9px; border: 1px solid var(--line); border-radius: 9px; outline: none; color: var(--text); background: var(--panel-soft); text-align: right; font-size: 12px; }
-    .small-input:focus { border-color: rgba(109, 74, 255, 0.45); background: #fff; }
-    .small-unit { position: absolute; top: 50%; right: 9px; transform: translateY(-50%); color: var(--muted-2); font-size: 9px; font-weight: 800; pointer-events: none; }
-    .duty-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .duty-settings-card { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--panel-soft); }
-    .duty-settings-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
-    .duty-settings-country { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 12px; font-weight: 800; }
-
-    .detail-table-wrap { margin-top: 12px; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
-    .detail-table-title { display: flex; align-items: center; gap: 7px; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 800; }
-    .detail-table { width: 100%; min-width: 1080px; border-collapse: collapse; font-size: 12px; }
-    .detail-table th { padding: 9px 10px; color: var(--muted-2); background: var(--panel-soft); text-align: right; font-size: 9px; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
-    .detail-table th:first-child, .detail-table td:first-child { text-align: left; }
-    .detail-table td { padding: 9px 10px; border-top: 1px solid #eef1f5; text-align: right; }
-    .detail-country { display: inline-flex; align-items: center; gap: 7px; font-weight: 750; }
-
-    .svg-icon { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
-    .svg-icon.small { width: 13px; height: 13px; }
-
-    @media (max-width: 880px) {
-      .input-grid { grid-template-columns: 1fr; }
-      .desktop-grid-wrap { display: none; }
-      .mobile-countries { display: block; }
-      .settings-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 540px) {
-      .header-inner, .page { width: min(100% - 20px, 1180px); }
-      .brand-subtitle { display: none; }
-      .page { padding-top: 12px; }
-      .primary-panel, .panel-head { padding-left: 14px; padding-right: 14px; }
-      .panel-head { align-items: flex-start; flex-direction: column; }
-      .duty-settings-grid { grid-template-columns: 1fr; }
-      .reset-btn span { display: none; }
-      .reset-btn { width: 36px; justify-content: center; padding: 0; }
-      .mobile-results { grid-template-columns: 1.08fr 0.92fr; }
-    }
-  </style>
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+  main{padding:12px}.top{padding:10px 12px}.inputs{grid-template-columns:1fr;padding:12px}
+  .country{padding:12px}.mid{grid-template-columns:1fr}.settings{grid-template-columns:1fr}
+  .seg{width:118px}.rrp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="brand">
-        <div class="brand-icon" aria-hidden="true">
-          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h4M8 15h2M12 15h4M8 19h2M12 19h4"/></svg>
-        </div>
-        <div>
-          <h1 class="brand-title">Калькулятор LDP / IMU</h1>
-          <p class="brand-subtitle">Расчёт по странам и способам доставки</p>
-        </div>
+<header>
+  <div class="top">
+    <div class="brand">
+      <div class="logo">в€‘</div>
+      <div>
+        <h1>РљР°Р»СЊРєСѓР»СЏС‚РѕСЂ LDP / RRP / IMU</h1>
+        <div class="sub">Р Р°СЃС‡С‘С‚ РїРѕ СЃС‚СЂР°РЅР°Рј Рё СЃРїРѕСЃРѕР±Р°Рј РґРѕСЃС‚Р°РІРєРё</div>
       </div>
-      <button class="reset-btn" id="resetButton" type="button">
-        <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg>
-        <span>Сбросить</span>
-      </button>
     </div>
-  </header>
-
-  <main class="page">
-    <div class="stack">
-      <section class="panel primary-panel">
-        <div class="panel-head">
-          <div>
-            <h2 class="panel-title">Основные параметры</h2>
-            <p class="panel-subtitle">Введите исходные данные для расчёта</p>
-          </div>
-        </div>
-        <div class="input-grid">
-          <label class="input-card">
-            <span class="input-label">
-              <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              FOB
-            </span>
-            <span class="input-shell"><input class="main-input" id="fobInput" type="text" inputmode="decimal" value="1.99" /><span class="input-unit">$ / шт</span></span>
-          </label>
-          <label class="input-card">
-            <span class="input-label">
-              <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M6 3h12l2 6H4z"/><path d="M5 9h14l1 12H4z"/></svg>
-              Garment Weight
-            </span>
-            <span class="input-shell"><input class="main-input" id="weightInput" type="text" inputmode="decimal" value="0.095" /><span class="input-unit">кг</span></span>
-          </label>
-          <label class="input-card">
-            <span class="input-label">
-              <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M20.6 13.6 11 23.2 1 13.2V3h10.2z"/><circle cx="6" cy="8" r="1.3"/></svg>
-              RRP
-            </span>
-            <span class="input-shell"><input class="main-input" id="rrpInput" type="text" inputmode="decimal" value="799" /><span class="input-unit">₽</span></span>
-          </label>
-        </div>
-      </section>
-
-      <section class="panel country-panel">
-        <div class="panel-head">
-          <div>
-            <h2 class="panel-title">LDP по странам</h2>
-            <p class="panel-subtitle">Доставка и пошлина настраиваются отдельно для каждой страны</p>
-          </div>
-        </div>
-        <div class="desktop-grid-wrap">
-          <div class="desktop-grid" id="desktopCountries"></div>
-        </div>
-        <div class="mobile-countries" id="mobileCountries"></div>
-      </section>
-
-      <details class="panel">
-        <summary>
-          <div class="details-title">
-            <div class="details-icon">
-              <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
-            </div>
-            <div>
-              <div style="font-size:13px;font-weight:800">Подробные настройки</div>
-              <div style="margin-top:3px;color:var(--muted);font-size:11px">Тарифы, ставки пошлин и коэффициенты</div>
-            </div>
-          </div>
-          <svg class="svg-icon small" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
-        </summary>
-        <div class="details-body">
-          <div class="settings-grid">
-            <section class="settings-card">
-              <h3 class="settings-card-title">
-                <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
-                Общие параметры
-              </h3>
-              <div id="generalSettings"></div>
-            </section>
-            <section class="settings-card">
-              <h3 class="settings-card-title">
-                <svg class="svg-icon small" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
-                Пошлины по странам
-              </h3>
-              <div class="duty-settings-grid" id="dutySettings"></div>
-            </section>
-          </div>
-          <section class="detail-table-wrap">
-            <div class="detail-table-title">
-              <svg class="svg-icon small" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-              Детализация LDP
-            </div>
-            <table class="detail-table">
-              <thead><tr><th>Страна</th><th>Gross weight</th><th>Freight</th><th>Euro Duty</th><th>Duty in LDP</th><th>Certification</th><th>LDP USD</th><th>LDP RUB</th><th>IMU</th><th>LDP USD Finance</th><th>LDP RUB Finance</th><th>IMU Finance</th></tr></thead>
-              <tbody id="detailTableBody"></tbody>
-            </table>
-          </section>
-        </div>
-      </details>
+    <div class="actions"><button class="pdf-btn" id="openReport">PDF РѕС‚С‡С‘С‚</button><button class="reset" id="reset">в†» РЎР±СЂРѕСЃРёС‚СЊ</button></div>
+  </div>
+</header>
+<main>
+  <section class="panel">
+    <div class="mode-wrap">
+      <div>
+        <div class="mode-label">Р РµР¶РёРј СЂР°СЃС‡С‘С‚Р°</div>
+        <div class="sub">РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РЅРµ РјРµРЅСЏРµС‚ РёСЃС…РѕРґРЅСѓСЋ С„РѕСЂРјСѓР»Сѓ LDP</div>
+      </div>
+      <div class="mode-switcher">
+        <button class="mode-btn active" id="modeForward" type="button">РџРѕ FOB</button>
+        <button class="mode-btn" id="modeReverse" type="button">РџРѕ RRP</button>
+      </div>
     </div>
-  </main>
+    <div class="inputs">
+      <div class="field"><label>TG</label><select id="tg"><option>KNIT TOPS</option><option>OTHER</option></select></div>
+      <div class="field" id="fobField"><label>FOB</label><div class="wrap"><input id="fob" inputmode="decimal" value="1.99"><span class="suffix">$</span></div></div>
+      <div class="field hidden" id="reverseRrpField"><label>RRP РґР»СЏ РѕР±СЂР°С‚РЅРѕРіРѕ СЂР°СЃС‡С‘С‚Р°</label><select id="reverseRrp"></select></div>
+      <div class="field"><label>Garment Weight</label><div class="wrap"><input id="weight" inputmode="decimal" value="0.095"><span class="suffix">РєРі</span></div></div>
+    </div>
+  </section>
 
-  <script>
-    const ROUTES = [
-      { id: 'bd-land', country: 'Бангладеш', type: 'Land', way: 'Sea-Truck', days: 65, borderRate: 2050, fullRate: 9161.9736, unit: 'container' },
-      { id: 'bd-fast', country: 'Бангладеш', type: 'Fast', way: 'Sea-Air', days: 57, borderRate: 2050, fullRate: 23660.4319, unit: 'container' },
-      { id: 'bd-air', country: 'Бангладеш', type: 'Air', way: 'Air', days: 20, borderRate: 2.9064, fullRate: 4.1525, unit: 'kg' },
-      { id: 'cn-land', country: 'Китай', type: 'Land', way: 'Sea-Train', days: 50, borderRate: 2560, fullRate: 7059.5775, unit: 'container' },
-      { id: 'cn-fast', country: 'Китай', type: 'Fast', way: 'Sea-Truck', days: 44, borderRate: 2230, fullRate: 9227.7, unit: 'container' },
-      { id: 'cn-air', country: 'Китай', type: 'Air', way: 'Air', days: 18, borderRate: 5.0311, fullRate: 7.2285, unit: 'kg' },
-      { id: 'in-land', country: 'Индия', type: 'Land', way: 'Sea(Hub/Reel)', days: 59, borderRate: 5950, fullRate: 7753, unit: 'container' },
-      { id: 'in-fast', country: 'Индия', type: 'Fast', way: 'Sea-Truck', days: 79, borderRate: 2600, fullRate: 9528, unit: 'container' },
-      { id: 'in-air', country: 'Индия', type: 'Air', way: 'Air', days: 20, borderRate: 5.42, fullRate: 7.49, unit: 'kg' },
-      { id: 'vn-land', country: 'Вьетнам', type: 'Land', way: 'Sea-Train', days: 50, borderRate: 2287.5, fullRate: 7145.5689, unit: 'container' },
-      { id: 'vn-fast', country: 'Вьетнам', type: 'Fast', way: 'Sea-Truck', days: 44, borderRate: 1950, fullRate: 9306.1914, unit: 'container' },
-      { id: 'vn-air', country: 'Вьетнам', type: 'Air', way: 'Air', days: 17, borderRate: 3.8312, fullRate: 5.2404, unit: 'kg' },
-    ];
+  <section id="countries" class="grid"></section>
 
-    const COUNTRIES = ['Бангладеш', 'Китай', 'Индия', 'Вьетнам'];
-    const DELIVERY_TYPES = ['Land', 'Fast', 'Air'];
-    const DEFAULTS = {
-      inputs: { fob: '1.99', weight: '0.095', rrp: '799' },
-      general: { grossFactor: '1.11', loadNorm: '10000', usdRub: '87', eurPerUsd: '0.855', vatPercent: '10', certificationPercent: '0.3', fixedSystemRub: '0.6', commissionUsd: '0', defectCostUsd: '0', royaltyUsd: '0', financeFactor: '1.07075' },
-      routeByCountry: { 'Бангладеш': 'bd-land', 'Китай': 'cn-land', 'Индия': 'in-land', 'Вьетнам': 'vn-land' },
-      dutyByCountry: { 'Бангладеш': { percent: '0', fixedEuroKg: '1.75' }, 'Китай': { percent: '0', fixedEuroKg: '1.75' }, 'Индия': { percent: '0', fixedEuroKg: '1.75' }, 'Вьетнам': { percent: '0', fixedEuroKg: '1.75' } },
-      includeDutyByCountry: { 'Бангладеш': true, 'Китай': true, 'Индия': true, 'Вьетнам': false },
-    };
+  <details class="panel">
+    <summary class="details-head"><strong>РџРѕРґСЂРѕР±РЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё</strong><span>вЊ„</span></summary>
+    <div class="details-body">
+      <div class="settings">
+        <label class="setting"><span>Gross factor</span><input id="grossFactor" value="1.11"></label>
+        <label class="setting"><span>Load Norm</span><input id="loadNorm" value="10000"></label>
+        <label class="setting"><span>USD / RUB</span><input id="usdRub" value="87"></label>
+        <label class="setting"><span>EUR РЅР° 1 USD</span><input id="eurPerUsd" value="0.855"></label>
+        <label class="setting"><span>РќР”РЎ, %</span><input id="vat" value="10"></label>
+        <label class="setting"><span>Certification, %</span><input id="cert" value="0.3"></label>
+        <label class="setting"><span>РЎРёСЃС‚РµРјРЅР°СЏ РЅР°РґР±Р°РІРєР°, в‚Ѕ</span><input id="markup" value="0.6"></label>
+        <label class="setting"><span>Р¦РµР»РµРІРѕР№ IMU, %</span><input id="targetImu" value="71.7"></label>
+      </div>
+    </div>
+  </details>
+</main>
 
-    function deepClone(value) { return JSON.parse(JSON.stringify(value)); }
-    let state = deepClone(DEFAULTS);
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">RRP Рё IMU</div>
+        <div class="modal-sub">Р—РµР»С‘РЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РїСЂРѕС…РѕРґСЏС‚ С†РµР»РµРІРѕР№ IMU. Р’С‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕР№ RRP, С‡С‚РѕР±С‹ СЃСЂР°РІРЅРёС‚СЊ IMU РїСЂРё РґСЂСѓРіРѕР№ СЂРѕР·РЅРёС‡РЅРѕР№ С†РµРЅРµ.</div>
+      </div>
+      <button class="close" id="close">Г—</button>
+    </div>
+    <div id="rrpGrid" class="rrp-grid"></div>
+  </div>
+</div>
 
-    const icons = {
-      Land: '<svg class="svg-icon small" viewBox="0 0 24 24"><path d="M3 17h18M5 17V8l7-4 7 4v9M8 17v-5h8v5"/></svg>',
-      Fast: '<svg class="svg-icon small" viewBox="0 0 24 24"><path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>',
-      Air: '<svg class="svg-icon small" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>',
-      shieldOn: '<svg class="svg-icon small" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>',
-      shieldOff: '<svg class="svg-icon small" viewBox="0 0 24 24"><path d="m2 2 20 20"/><path d="M5.1 5.1 4 5.5V12c0 6 8 10 8 10a20 20 0 0 0 4.3-3"/><path d="M19.6 15.6A9.5 9.5 0 0 0 20 12V5l-8-3-3.2 1.2"/></svg>',
-    };
+<div class="overlay" id="reportOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Р’С‹РіСЂСѓР·РєР° РѕС‚С‡С‘С‚Р° PDF</div>
+        <div class="modal-sub">РўРµРєСЃС‚ Рё РёР·РѕР±СЂР°Р¶РµРЅРёРµ РјРѕРґРµР»Рё РѕРґРµР¶РґС‹ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹. РћС‚С‡С‘С‚ СЃС„РѕСЂРјРёСЂСѓРµС‚СЃСЏ Рё Р±РµР· РЅРёС….</div>
+      </div>
+      <button class="close" id="reportClose">Г—</button>
+    </div>
+    <div class="report-form">
+      <label class="report-label">
+        <span>РњРѕРґРµР»СЊ РѕРґРµР¶РґС‹ вЂ” С‚РµРєСЃС‚ РёР»Рё РєРѕРјРјРµРЅС‚Р°СЂРёР№</span>
+        <textarea id="reportModelText" placeholder="РќР°РїСЂРёРјРµСЂ: Р¶РµРЅСЃРєР°СЏ С„СѓС‚Р±РѕР»РєР° oversize, РјРѕРґРµР»СЊ SS26-014"></textarea>
+      </label>
+      <label class="report-label">
+        <span>РР·РѕР±СЂР°Р¶РµРЅРёРµ РјРѕРґРµР»Рё РѕРґРµР¶РґС‹</span>
+        <input id="reportImageInput" type="file" accept="image/*">
+      </label>
+      <img id="reportImagePreview" class="report-preview" alt="РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ РјРѕРґРµР»Рё РѕРґРµР¶РґС‹">
+      <div id="reportStatus" class="report-status"></div>
+      <div class="report-actions">
+        <button class="report-cancel" id="reportCancel" type="button">РћС‚РјРµРЅР°</button>
+        <button class="report-download" id="downloadReport" type="button">РЎРєР°С‡Р°С‚СЊ PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    function n(value) {
-      const parsed = Number(String(value).replace(',', '.'));
-      return Number.isFinite(parsed) ? parsed : 0;
-    }
-    function usd(value) { return '$' + value.toFixed(4); }
-    function rub(value) { return value.toFixed(2) + ' ₽'; }
-    function pct(value) { return (value * 100).toFixed(2) + '%'; }
+<script>
+const ROUTES=[
+{id:"bd-land",country:"Р‘Р°РЅРіР»Р°РґРµС€",type:"Land",way:"Sea-Truck",days:65,borderRate:2050,fullRate:9161.9736,unit:"container"},
+{id:"bd-fast",country:"Р‘Р°РЅРіР»Р°РґРµС€",type:"Fast",way:"Sea-Air",days:57,borderRate:2050,fullRate:23660.4319,unit:"container"},
+{id:"bd-air",country:"Р‘Р°РЅРіР»Р°РґРµС€",type:"Air",way:"Air",days:20,borderRate:2.9064,fullRate:4.1525,unit:"kg"},
+{id:"cn-land",country:"РљРёС‚Р°Р№",type:"Land",way:"Sea-Train",days:50,borderRate:2560,fullRate:7059.5775,unit:"container"},
+{id:"cn-fast",country:"РљРёС‚Р°Р№",type:"Fast",way:"Sea-Truck",days:44,borderRate:2230,fullRate:9227.7,unit:"container"},
+{id:"cn-air",country:"РљРёС‚Р°Р№",type:"Air",way:"Air",days:18,borderRate:5.0311,fullRate:7.2285,unit:"kg"},
+{id:"in-land",country:"РРЅРґРёСЏ",type:"Land",way:"Sea(Hub/Reel)",days:59,borderRate:5950,fullRate:7753,unit:"container"},
+{id:"in-fast",country:"РРЅРґРёСЏ",type:"Fast",way:"Sea-Truck",days:79,borderRate:2600,fullRate:9528,unit:"container"},
+{id:"in-air",country:"РРЅРґРёСЏ",type:"Air",way:"Air",days:20,borderRate:5.42,fullRate:7.49,unit:"kg"},
+{id:"vn-land",country:"Р’СЊРµС‚РЅР°Рј",type:"Land",way:"Sea-Train",days:50,borderRate:2287.5,fullRate:7145.5689,unit:"container"},
+{id:"vn-fast",country:"Р’СЊРµС‚РЅР°Рј",type:"Fast",way:"Sea-Truck",days:44,borderRate:1950,fullRate:9306.1914,unit:"container"},
+{id:"vn-air",country:"Р’СЊРµС‚РЅР°Рј",type:"Air",way:"Air",days:17,borderRate:3.8312,fullRate:5.2404,unit:"kg"}];
+const COUNTRIES=["Р‘Р°РЅРіР»Р°РґРµС€","РљРёС‚Р°Р№","РРЅРґРёСЏ","Р’СЊРµС‚РЅР°Рј"];
+const ALL_RRP=[499,599,699,799,899,999,1199,1299,1399,1499,1599,1699,1799,1899,1999];
+const state={mode:"forward",routes:{"Р‘Р°РЅРіР»Р°РґРµС€":"bd-land","РљРёС‚Р°Р№":"cn-land","РРЅРґРёСЏ":"in-land","Р’СЊРµС‚РЅР°Рј":"vn-land"},dutyOn:{"Р‘Р°РЅРіР»Р°РґРµС€":true,"РљРёС‚Р°Р№":true,"РРЅРґРёСЏ":true,"Р’СЊРµС‚РЅР°Рј":false},selected:{},popup:null};
+const fixedDuty={"Р‘Р°РЅРіР»Р°РґРµС€":{percent:0,fixedEuroKg:1.75},"РљРёС‚Р°Р№":{percent:0,fixedEuroKg:1.75},"РРЅРґРёСЏ":{percent:0,fixedEuroKg:1.75},"Р’СЊРµС‚РЅР°Рј":{percent:0,fixedEuroKg:1.75}};
+const flags={
+"Р‘Р°РЅРіР»Р°РґРµС€":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#006a4e"/><circle cx="13" cy="10" r="6" fill="#f42a41"/></svg>',
+"РљРёС‚Р°Р№":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><path d="M5 3.1l.75 2.25h2.37L6.2 6.75l.73 2.25L5 7.61 3.07 9l.73-2.25-1.92-1.4h2.37z" fill="#ffde00"/></svg>',
+"РРЅРґРёСЏ":'<svg viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#ff9933"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.34" width="30" height="6.66" fill="#138808"/></svg>',
+"Р’СЊРµС‚РЅР°Рј":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><path d="M15 4.1l1.39 4.27h4.49l-3.63 2.64 1.39 4.27L15 12.64l-3.64 2.64 1.39-4.27-3.63-2.64h4.49z" fill="#ff0"/></svg>'};
+const icon={Land:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><path d="M4 14h16l-2 4H6z"/><path d="M8 14V8h7v6"/><path d="M15 10h3"/></svg>',Fast:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',Air:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>'};
+const $=id=>document.getElementById(id); const num=v=>{const x=Number(String(v).replace(",", "."));return Number.isFinite(x)?x:0}; const usd=v=>`$${v.toFixed(4)}`; const rub=v=>`${v.toFixed(2)} в‚Ѕ`; const pct=v=>`${(v*100).toFixed(2)}%`;
+function rrpValues(){return $("tg").value==="KNIT TOPS"?ALL_RRP.filter(v=>v<=1299):ALL_RRP}
+function target(){return num($("targetImu").value)/100}
+function calc(country){
+ const route=ROUTES.find(r=>r.id===state.routes[country])||ROUTES.find(r=>r.country===country), f=num($("fob").value), w=num($("weight").value), gross=w*num($("grossFactor").value), load=Math.max(num($("loadNorm").value),1), usdRub=Math.max(num($("usdRub").value),.0001), eur=Math.max(num($("eurPerUsd").value),.0001), vat=1+num($("vat").value)/100;
+ const freightBorder=route.unit==="kg"?gross*route.borderRate:gross*route.borderRate/load, freight=route.unit==="kg"?gross*route.fullRate:gross*route.fullRate/load;
+ const currentDuty=fixedDuty[country], percentDuty=(f+freightBorder)*(num(currentDuty.percent)/100), euroDuty=w*num(currentDuty.fixedEuroKg)/eur, finalDuty=state.dutyOn[country]?Math.max(percentDuty,euroDuty):0;
+ const certification=f*num($("cert").value)/100, ldp=f+finalDuty+freight+certification+num($("markup").value)/usdRub, ldpRub=ldp*usdRub;
+ const values=rrpValues(), opts=values.map(rrp=>({rrp,imu:1-ldpRub/(rrp/vat)})), rec=(opts.find(o=>o.imu>target())||{}).rrp||null, selectedCandidate=state.selected[country], selected=values.includes(selectedCandidate)?selectedCandidate:(rec||values[values.length-1]);
+ return {country,route,ldp,ldpRub,opts,rec,selected,imu:opts.find(o=>o.rrp===selected).imu};
+}
+function ldpForFob(country,fobValue){
+ const route=ROUTES.find(r=>r.id===state.routes[country])||ROUTES.find(r=>r.country===country),w=num($("weight").value),gross=w*num($("grossFactor").value),load=Math.max(num($("loadNorm").value),1),usdRub=Math.max(num($("usdRub").value),.0001),eur=Math.max(num($("eurPerUsd").value),.0001);
+ const freightBorder=route.unit==="kg"?gross*route.borderRate:gross*route.borderRate/load,freight=route.unit==="kg"?gross*route.fullRate:gross*route.fullRate/load;
+ const currentDuty=fixedDuty[country],percentDuty=(fobValue+freightBorder)*(num(currentDuty.percent)/100),euroDuty=w*num(currentDuty.fixedEuroKg)/eur,finalDuty=state.dutyOn[country]?Math.max(percentDuty,euroDuty):0;
+ const certification=fobValue*num($("cert").value)/100;
+ return fobValue+finalDuty+freight+certification+num($("markup").value)/usdRub
+}
+function solveMaxFob(country,maxLdp){
+ const baseLdp=ldpForFob(country,0);
+ if(maxLdp<baseLdp)return {possible:false,maxFob:0,baseLdp};
+ let low=0,high=Math.max(maxLdp,1);
+ while(ldpForFob(country,high)<maxLdp&&high<100000)high*=2;
+ for(let i=0;i<56;i++){const mid=(low+high)/2;if(ldpForFob(country,mid)<=maxLdp)low=mid;else high=mid}
+ return {possible:true,maxFob:low,baseLdp}
+}
+function reverseCalc(country){
+ const values=rrpValues(),selectedRrp=Math.max(num($("reverseRrp").value),0),index=Math.max(values.indexOf(selectedRrp),0),previousRrp=index>0?values[index-1]:null;
+ const usdRub=Math.max(num($("usdRub").value),.0001),vat=1+num($("vat").value)/100;
+ const maxLdpRub=(selectedRrp/vat)*(1-target()),maxLdp=maxLdpRub/usdRub,current=solveMaxFob(country,maxLdp);
+ const previousMaxLdpRub=previousRrp?(previousRrp/vat)*(1-target()):0,previousMaxLdp=previousMaxLdpRub/usdRub,previous=previousRrp?solveMaxFob(country,previousMaxLdp):{possible:true,maxFob:0,baseLdp:current.baseLdp};
+ const minFob=previous.possible?previous.maxFob:0,maxFob=current.maxFob,possible=current.possible;
+ const route=ROUTES.find(r=>r.id===state.routes[country])||ROUTES.find(r=>r.country===country);
+ return {country,route,rrp:selectedRrp,previousRrp,maxLdp,maxLdpRub,previousMaxLdp,previousMaxLdpRub,minFob,maxFob,baseLdp:current.baseLdp,possible}
+}
+function refreshRrpSuggestions(){
+ const select=$("reverseRrp"),current=Number(select.value)||799,values=rrpValues();
+ select.innerHTML=values.map(value=>`<option value="${value}">${value} в‚Ѕ</option>`).join("");
+ select.value=values.includes(current)?String(current):String(values.find(value=>value>=current)||values[values.length-1])
+}
+function setMode(mode){
+ state.mode=mode;
+ $("modeForward").classList.toggle("active",mode==="forward");
+ $("modeReverse").classList.toggle("active",mode==="reverse");
+ $("fobField").classList.toggle("hidden",mode!=="forward");
+ $("reverseRrpField").classList.toggle("hidden",mode!=="reverse");
+ render()
+}
+function render(){
+ if(state.mode==="reverse"){
+  $("countries").innerHTML=COUNTRIES.map(c=>{const r=reverseCalc(c);return `<article class="country">
+ <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} В· ${r.route.days} РґРЅ.</div></div></div>
+ <div class="seg">${["Land","Fast","Air"].map(t=>`<button class="${r.route.type===t?"active":""}" data-route="${c}|${t}" title="${t}">${icon[t]}</button>`).join("")}</div></div>
+ <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">РџРѕС€Р»РёРЅР°</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Р’РєР».":"Р’С‹РєР»."}</span><span class="switch"></span></div></button>
+ <div class="ldp"><div class="eyebrow">RRP</div><div class="ldp-usd">${r.rrp.toFixed(0)} в‚Ѕ</div><div class="ldp-rub">Р¦РµР»РµРІРѕР№ IMU: ${pct(target())}</div></div></div>
+ <div class="reverse-grid">
+  <div class="reverse-card"><div class="reverse-title">Р”РёР°РїР°Р·РѕРЅ LDP</div><div class="reverse-value">${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"вЂ”"}</div><div class="reverse-sub">${r.previousRrp?`Р“СЂР°РЅРёС†Р° РјРµР¶РґСѓ ${r.previousRrp} в‚Ѕ Рё ${r.rrp} в‚Ѕ`:`РќРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° РґР»СЏ ${r.rrp} в‚Ѕ`}</div></div>
+  <div class="reverse-card fob"><div class="reverse-title">Р”РёР°РїР°Р·РѕРЅ FOB</div><div class="reverse-value">${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"вЂ”"}</div><div class="reverse-sub">${r.previousRrp?`FOB РґР»СЏ РїРµСЂРµС…РѕРґР° СЃ ${r.previousRrp} в‚Ѕ РЅР° ${r.rrp} в‚Ѕ`:`FOB РґРѕ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹ ${r.rrp} в‚Ѕ`}</div></div>
+ </div>
+ <div class="reverse-status ${r.possible?"":"bad"}">${r.possible?"РџРѕРєР°Р·Р°РЅ РґРёР°РїР°Р·РѕРЅ FOB РґР»СЏ РІС‹Р±СЂР°РЅРЅРѕР№ С†РµРЅРѕРІРѕР№ СЃС‚СѓРїРµРЅРё RRP.":"Р”Р°Р¶Рµ РїСЂРё FOB = $0 С†РµР»РµРІРѕР№ IMU РЅРµРґРѕСЃС‚РёР¶РёРј."}</div>
+ </article>`}).join("");
+ }else{
+  $("countries").innerHTML=COUNTRIES.map(c=>{const r=calc(c);return `<article class="country">
+ <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} В· ${r.route.days} РґРЅ.</div></div></div>
+ <div class="seg">${["Land","Fast","Air"].map(t=>`<button class="${r.route.type===t?"active":""}" data-route="${c}|${t}" title="${t}">${icon[t]}</button>`).join("")}</div></div>
+ <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">РџРѕС€Р»РёРЅР°</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Р’РєР».":"Р’С‹РєР»."}</span><span class="switch"></span></div></button>
+ <div class="ldp"><div class="eyebrow">LDP</div><div class="ldp-usd">${usd(r.ldp)}</div><div class="ldp-rub">${rub(r.ldpRub)}</div></div></div>
+ <button class="rrp" data-open="${c}"><div class="rrp-main"><div class="eyebrow">Min RRP</div><div class="rrp-value">${r.rec?r.rec+" в‚Ѕ":"вЂ”"}</div><div class="rrp-sub">Р’С‹Р±СЂР°РЅРЅС‹Р№ RRP: ${r.selected} в‚Ѕ</div></div><div style="display:flex;align-items:center;gap:8px"><div class="imu">${pct(r.imu)}</div><div class="more">вЂє</div></div></button>
+ </article>`}).join("");
+ }
+ document.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>{const [c,t]=b.dataset.route.split("|");state.routes[c]=ROUTES.find(r=>r.country===c&&r.type===t).id;render()});
+ document.querySelectorAll("[data-duty]").forEach(b=>b.onclick=()=>{const c=b.dataset.duty;state.dutyOn[c]=!state.dutyOn[c];render()});
+ document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openPopup(b.dataset.open));
+}
+function openPopup(c){state.popup=c;const r=calc(c);$("rrpGrid").innerHTML=r.opts.map(o=>`<button class="rrp-option ${o.imu>target()?"ok":"bad"} ${o.rrp===r.selected?"active":""}" data-pick="${c}|${o.rrp}"><div class="rrp-option-top"><span class="rrp-price">${o.rrp} в‚Ѕ</span><span class="badge">${o.imu>target()?"вњ“":"Г—"}</span></div><div class="rrp-imu">${pct(o.imu)}</div></button>`).join("");$("overlay").classList.add("show");document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{const [cc,p]=b.dataset.pick.split("|");state.selected[cc]=Number(p);closePopup();render()})}
+function closePopup(){$("overlay").classList.remove("show");state.popup=null}
+["fob","weight","grossFactor","loadNorm","usdRub","eurPerUsd","vat","cert","markup","targetImu"].forEach(id=>$(id).addEventListener("input",render));
+$("reverseRrp").addEventListener("change",render);
+$("tg").addEventListener("change",()=>{state.selected={};refreshRrpSuggestions();render()});
+$("modeForward").onclick=()=>setMode("forward");$("modeReverse").onclick=()=>setMode("reverse");
+$("close").onclick=closePopup;$("overlay").onclick=e=>{if(e.target===$("overlay"))closePopup()};
 
-    function flag(country, small = false) {
-      const cls = small ? 'flag small' : 'flag';
-      if (country === 'Бангладеш') return `<svg class="${cls}" viewBox="0 0 30 20"><rect width="30" height="20" fill="#006a4e"/><circle cx="13" cy="10" r="6" fill="#f42a41"/></svg>`;
-      if (country === 'Китай') return `<svg class="${cls}" viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><path d="M5 3.1l.75 2.25h2.37L6.2 6.75l.73 2.25L5 7.61 3.07 9l.73-2.25-1.92-1.4h2.37z" fill="#ffde00"/><circle cx="10" cy="3.6" r=".7" fill="#ffde00"/><circle cx="12.1" cy="5.7" r=".7" fill="#ffde00"/><circle cx="12" cy="8.6" r=".7" fill="#ffde00"/><circle cx="9.8" cy="10.5" r=".7" fill="#ffde00"/></svg>`;
-      if (country === 'Индия') return `<svg class="${cls}" viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#ff9933"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.34" width="30" height="6.66" fill="#138808"/><circle cx="15" cy="10" r="2.3" fill="none" stroke="#000080" stroke-width=".45"/><circle cx="15" cy="10" r=".45" fill="#000080"/><path d="M15 7.7v4.6M12.7 10h4.6M13.37 8.37l3.26 3.26M16.63 8.37l-3.26 3.26" stroke="#000080" stroke-width=".35"/></svg>`;
-      return `<svg class="${cls}" viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><path d="M15 4.1l1.39 4.27h4.49l-3.63 2.64 1.39 4.27L15 12.64l-3.64 2.64 1.39-4.27-3.63-2.64h4.49z" fill="#ff0"/></svg>`;
-    }
+let reportImageData="";
+function loadScriptOnce(src,id){
+ return new Promise((resolve,reject)=>{
+  if(document.getElementById(id)){resolve();return}
+  const s=document.createElement("script");s.id=id;s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ Р±РёР±Р»РёРѕС‚РµРєСѓ PDF"));document.head.appendChild(s)
+ })
+}
+function escapeHtml(value){
+ return String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))
+}
+function reportRows(){
+ if(state.mode==="reverse"){
+  return COUNTRIES.map(country=>{const r=reverseCalc(country);return `<tr>
+    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} В· ${r.route.days} РґРЅ.</td><td>${state.dutyOn[country]?"Р’РєР».":"Р’С‹РєР»."}</td>
+    <td>${r.rrp.toFixed(0)} в‚Ѕ</td><td>${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"вЂ”"}</td><td>${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"вЂ”"}</td>
+  </tr>`}).join("")
+ }
+ return COUNTRIES.map(country=>{const r=calc(country);return `<tr>
+    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} В· ${r.route.days} РґРЅ.</td><td>${state.dutyOn[country]?"Р’РєР».":"Р’С‹РєР»."}</td>
+    <td>${usd(r.ldp)}</td><td>${rub(r.ldpRub)}</td><td>${r.rec?r.rec+" в‚Ѕ":"вЂ”"}</td><td>${r.selected} в‚Ѕ</td><td>${pct(r.imu)}</td>
+  </tr>`}).join("")
+}
+function reportHead(){
+ return state.mode==="reverse"
+ ?"<tr><th>РЎС‚СЂР°РЅР°</th><th>Р”РѕСЃС‚Р°РІРєР°</th><th>РџРѕС€Р»РёРЅР°</th><th>RRP</th><th>РњР°РєСЃ. LDP USD</th><th>РњР°РєСЃ. LDP RUB</th><th>РњР°РєСЃ. FOB</th></tr>"
+ :"<tr><th>РЎС‚СЂР°РЅР°</th><th>Р”РѕСЃС‚Р°РІРєР°</th><th>РџРѕС€Р»РёРЅР°</th><th>LDP USD</th><th>LDP RUB</th><th>Min RRP</th><th>Р’С‹Р±СЂР°РЅРЅС‹Р№ RRP</th><th>IMU</th></tr>"
+}
+function buildReportElement(){
+ const text=$("reportModelText").value.trim();
+ const container=document.createElement("div");
+ container.style.cssText="position:fixed;left:-10000px;top:0;width:794px;background:#fff;color:#0f172a;padding:34px;font-family:Arial,sans-serif;font-size:13px;line-height:1.45";
+ container.innerHTML=`<style>
+  .pdf-title{font-size:24px;font-weight:800;margin:0}.pdf-muted{color:#64748b}.pdf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.pdf-kpi{border:1px solid #e2e8f0;border-radius:10px;padding:10px}.pdf-kpi b{display:block;margin-top:4px;font-size:15px}.pdf-model{display:flex;gap:16px;align-items:flex-start;margin:16px 0}.pdf-model img{width:170px;max-height:190px;object-fit:contain;border:1px solid #e2e8f0;border-radius:10px}.pdf-note{white-space:pre-wrap;border:1px solid #e2e8f0;border-radius:10px;padding:12px;background:#f8fafc;flex:1;min-height:76px}.pdf-table{width:100%;border-collapse:collapse;margin-top:18px;font-size:11px}.pdf-table th,.pdf-table td{border:1px solid #e2e8f0;padding:7px;text-align:left;vertical-align:top}.pdf-table th{background:#f1f5f9;font-weight:800}.pdf-footer{margin-top:14px;font-size:10px;color:#64748b}
+ </style>
+ <h1 class="pdf-title">РћС‚С‡С‘С‚ LDP / RRP / IMU</h1>
+ <div class="pdf-muted">РЎС„РѕСЂРјРёСЂРѕРІР°РЅ: ${new Date().toLocaleString("ru-RU")}</div>
+ <div class="pdf-grid">
+   <div class="pdf-kpi"><span class="pdf-muted">Р РµР¶РёРј</span><b>${state.mode==="reverse"?"РџРѕ RRP":"РџРѕ FOB"}</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">${state.mode==="reverse"?"RRP":"FOB"}</span><b>${state.mode==="reverse"?escapeHtml($("reverseRrp").value)+" в‚Ѕ":escapeHtml($("fob").value)+" $"}</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Garment Weight</span><b>${escapeHtml($("weight").value)} РєРі</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Р¦РµР»РµРІРѕР№ IMU</span><b>${escapeHtml($("targetImu").value)}%</b></div>
+ </div>
+ ${(text||reportImageData)?`<div class="pdf-model">${reportImageData?`<img src="${reportImageData}" alt="">`:""}${text?`<div class="pdf-note">${escapeHtml(text)}</div>`:""}</div>`:""}
+ <table class="pdf-table">
+  <thead>${reportHead()}</thead>
+  <tbody>${reportRows()}</tbody>
+ </table>
+ <div class="pdf-footer">Р Р°СЃС‡С‘С‚ СЃС„РѕСЂРјРёСЂРѕРІР°РЅ РєР°Р»СЊРєСѓР»СЏС‚РѕСЂРѕРј LDP / RRP / IMU.</div>`;
+ document.body.appendChild(container);
+ return container
+}
+async function exportReportPdf(){
+ const btn=$("downloadReport"),status=$("reportStatus");
+ btn.disabled=true;status.textContent="Р¤РѕСЂРјРёСЂСѓРµРј PDFвЂ¦";
+ let report=null;
+ try{
+  await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js","html2canvas-lib");
+  await loadScriptOnce("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js","jspdf-lib");
+  report=buildReportElement();
+  if(reportImageData){await new Promise(resolve=>setTimeout(resolve,120))}
+  const canvas=await window.html2canvas(report,{scale:2,useCORS:true,backgroundColor:"#ffffff",logging:false});
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF("p","mm","a4");
+  const pageW=210,pageH=297,margin=8,imgW=pageW-margin*2,imgH=canvas.height*imgW/canvas.width;
+  const data=canvas.toDataURL("image/jpeg",0.93);
+  let y=margin,remaining=imgH;
+  pdf.addImage(data,"JPEG",margin,y,imgW,imgH);
+  remaining-=pageH-margin*2;
+  while(remaining>0){
+   pdf.addPage();
+   y=margin-(imgH-remaining);
+   pdf.addImage(data,"JPEG",margin,y,imgW,imgH);
+   remaining-=pageH-margin*2
+  }
+  const stamp=new Date().toISOString().slice(0,10);
+  pdf.save(`ldp-rrp-imu-report-${stamp}.pdf`);
+  status.textContent="PDF СЃС„РѕСЂРјРёСЂРѕРІР°РЅ.";
+  setTimeout(()=>{$("reportOverlay").classList.remove("show");status.textContent=""},450)
+ }catch(err){
+  console.error(err);
+  status.textContent="РќРµ СѓРґР°Р»РѕСЃСЊ СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ PDF. РџСЂРѕРІРµСЂСЊС‚Рµ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє РёРЅС‚РµСЂРЅРµС‚Сѓ Рё РїРѕРІС‚РѕСЂРёС‚Рµ."
+ }finally{
+  if(report)report.remove();
+  btn.disabled=false
+ }
+}
+$("openReport").onclick=()=>{$("reportOverlay").classList.add("show")};
+$("reportClose").onclick=()=>{$("reportOverlay").classList.remove("show")};
+$("reportCancel").onclick=()=>{$("reportOverlay").classList.remove("show")};
+$("reportOverlay").onclick=e=>{if(e.target===$("reportOverlay"))$("reportOverlay").classList.remove("show")};
+$("reportImageInput").onchange=e=>{
+ const file=e.target.files&&e.target.files[0],preview=$("reportImagePreview");
+ if(!file){reportImageData="";preview.src="";preview.classList.remove("show");return}
+ const reader=new FileReader();
+ reader.onload=()=>{reportImageData=reader.result;preview.src=reportImageData;preview.classList.add("show")};
+ reader.readAsDataURL(file)
+};
+$("downloadReport").onclick=exportReportPdf;
 
-    function routeFor(country) {
-      return ROUTES.find(route => route.id === state.routeByCountry[country]) || ROUTES.find(route => route.country === country);
-    }
-
-    function calculations() {
-      const fob = n(state.inputs.fob);
-      const weight = n(state.inputs.weight);
-      const grossWeight = weight * n(state.general.grossFactor);
-      const loadNorm = Math.max(n(state.general.loadNorm), 1);
-      const usdRub = Math.max(n(state.general.usdRub), 0.0001);
-      const eurPerUsd = Math.max(n(state.general.eurPerUsd), 0.0001);
-      const rrpNet = n(state.inputs.rrp) / (1 + n(state.general.vatPercent) / 100);
-
-      return COUNTRIES.map(country => {
-        const route = routeFor(country);
-        const duty = state.dutyByCountry[country];
-        const freightToBorder = route.unit === 'kg' ? grossWeight * route.borderRate : grossWeight * route.borderRate / loadNorm;
-        const freightCost = route.unit === 'kg' ? grossWeight * route.fullRate : grossWeight * route.fullRate / loadNorm;
-        const percentageDuty = (fob + freightToBorder) * (n(duty.percent) / 100);
-        const euroDuty = weight * n(duty.fixedEuroKg) / eurPerUsd;
-        const calculatedDuty = Math.max(percentageDuty, euroDuty);
-        const finalDuty = state.includeDutyByCountry[country] ? calculatedDuty : 0;
-        const certification = fob * (n(state.general.certificationPercent) / 100);
-        const ldpUsd = fob + finalDuty + freightCost + certification + n(state.general.commissionUsd) + n(state.general.defectCostUsd) + n(state.general.fixedSystemRub) / usdRub + n(state.general.royaltyUsd);
-        const ldpRub = ldpUsd * usdRub;
-        const imu = rrpNet > 0 ? 1 - ldpRub / rrpNet : 0;
-        const ldpUsdFinance = ldpUsd * n(state.general.financeFactor);
-        const ldpRubFinance = ldpUsdFinance * usdRub;
-        const imuFinance = rrpNet > 0 ? 1 - ldpRubFinance / rrpNet : 0;
-        return { country, route, grossWeight, freightCost, euroDuty, finalDuty, certification, ldpUsd, ldpRub, imu, ldpUsdFinance, ldpRubFinance, imuFinance };
-      });
-    }
-
-    function deliverySwitch(country, activeRouteId) {
-      return `<div class="segmented">${DELIVERY_TYPES.map(type => {
-        const route = ROUTES.find(item => item.country === country && item.type === type);
-        const active = route && route.id === activeRouteId;
-        return `<button class="segment-btn${active ? ' active' : ''}" type="button" data-action="route" data-country="${country}" data-route="${route ? route.id : ''}" ${route ? '' : 'disabled'}>${icons[type]}<span>${type}</span></button>`;
-      }).join('')}</div>`;
-    }
-
-    function dutySwitch(country, checked) {
-      return `<button class="duty-switch${checked ? ' on' : ''}" type="button" data-action="duty" data-country="${country}"><span class="duty-label">${checked ? icons.shieldOn : icons.shieldOff}<span>${checked ? 'Вкл.' : 'Выкл.'}</span></span><span class="toggle-track"><span class="toggle-knob"></span></span></button>`;
-    }
-
-    function renderCountries(results) {
-      document.getElementById('desktopCountries').innerHTML = `
-        <div class="country-grid header"><div>Страна</div><div>Доставка</div><div>Пошлина</div><div class="metric">LDP USD</div><div class="metric">LDP RUB</div><div class="metric">IMU</div></div>
-        ${results.map(result => `<div class="country-grid country-row">
-          <div class="country-cell">${flag(result.country)}<div style="min-width:0"><p class="country-name">${result.country}</p><p class="country-route">${result.route.way} · ${result.route.days} дн.</p></div></div>
-          <div>${deliverySwitch(result.country, result.route.id)}</div>
-          <div>${dutySwitch(result.country, state.includeDutyByCountry[result.country])}</div>
-          <div class="metric metric-usd">${usd(result.ldpUsd)}</div>
-          <div class="metric metric-rub">${rub(result.ldpRub)}</div>
-          <div class="metric"><span class="imu-badge">${pct(result.imu)}</span></div>
-        </div>`).join('')}`;
-
-      document.getElementById('mobileCountries').innerHTML = results.map(result => `<article class="mobile-card">
-        <div class="mobile-top">
-          <div class="country-cell">${flag(result.country)}<div style="min-width:0"><p class="country-name">${result.country}</p><p class="country-route">${result.route.way} · ${result.route.days} дн.</p></div></div>
-          ${dutySwitch(result.country, state.includeDutyByCountry[result.country])}
-        </div>
-        <div style="margin-top:11px">${deliverySwitch(result.country, result.route.id)}</div>
-        <div class="mobile-results">
-          <div class="ldp-card"><div class="tiny-caption">LDP USD</div><div class="mobile-value">${usd(result.ldpUsd)}</div><div class="mobile-subvalue">${rub(result.ldpRub)}</div></div>
-          <div class="imu-card"><div class="tiny-caption">IMU</div><div class="mobile-value">${pct(result.imu)}</div></div>
-        </div>
-      </article>`).join('');
-    }
-
-    const GENERAL_FIELDS = [
-      ['grossFactor', 'Gross weight factor', ''], ['loadNorm', 'Load Norm', ''], ['usdRub', 'USD / RUB', ''], ['eurPerUsd', 'EUR на 1 USD', ''], ['vatPercent', 'НДС', '%'], ['certificationPercent', 'Certification', '%'], ['fixedSystemRub', 'Системная надбавка', '₽'], ['commissionUsd', 'Commission', '$'], ['defectCostUsd', 'Defect Cost', '$'], ['royaltyUsd', 'Royalty USD', '$'], ['financeFactor', 'Finance factor', ''],
-    ];
-
-    function smallField(scope, key, label, value, unit = '', country = '') {
-      return `<label class="small-field"><span class="small-label">${label}</span><span class="small-input-shell"><input class="small-input" type="text" inputmode="decimal" data-scope="${scope}" data-key="${key}" data-country="${country}" value="${value}">${unit ? `<span class="small-unit">${unit}</span>` : ''}</span></label>`;
-    }
-
-    function renderSettings() {
-      document.getElementById('generalSettings').innerHTML = GENERAL_FIELDS.map(([key, label, unit]) => smallField('general', key, label, state.general[key], unit)).join('');
-      document.getElementById('dutySettings').innerHTML = COUNTRIES.map(country => {
-        const duty = state.dutyByCountry[country];
-        return `<article class="duty-settings-card"><div class="duty-settings-head"><div class="duty-settings-country">${flag(country, true)}<span>${country}</span></div>${dutySwitch(country, state.includeDutyByCountry[country])}</div>${smallField('duty', 'percent', 'Duty', duty.percent, '%', country)}${smallField('duty', 'fixedEuroKg', 'Fixed Duty', duty.fixedEuroKg, '€/кг', country)}</article>`;
-      }).join('');
-    }
-
-    function renderDetailTable(results) {
-      document.getElementById('detailTableBody').innerHTML = results.map(result => `<tr><td><span class="detail-country">${flag(result.country, true)}${result.country}</span></td><td>${result.grossWeight.toFixed(4)}</td><td>${usd(result.freightCost)}</td><td>${usd(result.euroDuty)}</td><td>${usd(result.finalDuty)}</td><td>${usd(result.certification)}</td><td>${usd(result.ldpUsd)}</td><td>${rub(result.ldpRub)}</td><td>${pct(result.imu)}</td><td>${usd(result.ldpUsdFinance)}</td><td>${rub(result.ldpRubFinance)}</td><td>${pct(result.imuFinance)}</td></tr>`).join('');
-    }
-
-    function syncPrimaryInputs() {
-      document.getElementById('fobInput').value = state.inputs.fob;
-      document.getElementById('weightInput').value = state.inputs.weight;
-      document.getElementById('rrpInput').value = state.inputs.rrp;
-    }
-
-    function render() {
-      const results = calculations();
-      renderCountries(results);
-      renderSettings();
-      renderDetailTable(results);
-    }
-
-    document.getElementById('fobInput').addEventListener('input', event => { state.inputs.fob = event.target.value; render(); });
-    document.getElementById('weightInput').addEventListener('input', event => { state.inputs.weight = event.target.value; render(); });
-    document.getElementById('rrpInput').addEventListener('input', event => { state.inputs.rrp = event.target.value; render(); });
-    document.getElementById('resetButton').addEventListener('click', () => { state = deepClone(DEFAULTS); syncPrimaryInputs(); render(); });
-
-    document.addEventListener('click', event => {
-      const button = event.target.closest('[data-action]');
-      if (!button) return;
-      const country = button.dataset.country;
-      if (button.dataset.action === 'route') {
-        if (!button.dataset.route) return;
-        state.routeByCountry[country] = button.dataset.route;
-      }
-      if (button.dataset.action === 'duty') state.includeDutyByCountry[country] = !state.includeDutyByCountry[country];
-      render();
-    });
-
-    document.addEventListener('input', event => {
-      const input = event.target.closest('[data-scope]');
-      if (!input) return;
-      if (input.dataset.scope === 'general') state.general[input.dataset.key] = input.value;
-      if (input.dataset.scope === 'duty') state.dutyByCountry[input.dataset.country][input.dataset.key] = input.value;
-      render();
-    });
-
-    render();
-  </script>
+$("reset").onclick=()=>{state.routes={"Р‘Р°РЅРіР»Р°РґРµС€":"bd-land","РљРёС‚Р°Р№":"cn-land","РРЅРґРёСЏ":"in-land","Р’СЊРµС‚РЅР°Рј":"vn-land"};state.dutyOn={"Р‘Р°РЅРіР»Р°РґРµС€":true,"РљРёС‚Р°Р№":true,"РРЅРґРёСЏ":true,"Р’СЊРµС‚РЅР°Рј":false};state.selected={};$("tg").value="KNIT TOPS";$("fob").value="1.99";refreshRrpSuggestions();$("reverseRrp").value="799";$("weight").value="0.095";$("targetImu").value="71.7";refreshRrpSuggestions();setMode("forward")};
+refreshRrpSuggestions();render();
+</script>
 </body>
 </html>
