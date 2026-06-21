@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Калькулятор LDP / RRP / IMU — restored baseline</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
+  --soft:#f8fafc;--violet:#6d28d9;--violet2:#4f46e5;--green:#10b981;--red:#ef4444;
+  --shadow:0 10px 28px rgba(15,23,42,.07)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top{max-width:1160px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:38px;height:38px;border-radius:13px;background:#0f172a;color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800}
+h1{font-size:15px;margin:0;font-weight:800}.sub{font-size:11px;color:var(--muted)}
+.reset{height:38px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:0 13px;color:#334155;font-weight:700}
+main{max-width:1160px;margin:0 auto;padding:16px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px}
+.field{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+.field label{display:block;font-size:12px;color:#64748b;font-weight:800;margin-bottom:8px}
+.wrap{position:relative}
+.field input,.field select{width:100%;height:48px;border:1px solid var(--line);border-radius:13px;background:#f8fafc;text-align:center;font-size:20px;font-weight:900;outline:none;padding:0 58px 0 12px}.field select{padding:0 12px;text-align:left;font-size:16px}
+.field input:focus,.field select:focus{border-color:#a78bfa;box-shadow:0 0 0 4px #ede9fe;background:#fff}
+.suffix{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:900;color:#94a3b8;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.country{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.country-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.country-main{display:flex;align-items:center;gap:10px;min-width:0}
+.flag{width:40px;height:27px;overflow:hidden;border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex:0 0 auto}
+.flag svg{width:100%;height:100%;display:block}
+.name{font-weight:900}.route{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#f1f5f9;border-radius:14px;padding:4px;width:132px}
+.seg button{height:34px;border:0;background:transparent;border-radius:10px;color:#94a3b8;display:grid;place-items:center}
+.seg button.active{background:#fff;color:#111827;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.seg svg{width:16px;height:16px}
+.mid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.duty,.ldp{border-radius:16px;padding:12px;border:1px solid var(--line)}
+.duty{display:flex;align-items:center;justify-content:space-between;background:#ecfdf5;border-color:#bbf7d0}
+.duty.off{background:#f8fafc;border-color:#e2e8f0}
+.duty-title{font-size:13px;font-weight:900}.duty-state{font-size:12px;font-weight:900;color:#047857}.duty.off .duty-state{color:#64748b}
+.switch{width:44px;height:24px;border-radius:999px;background:#cbd5e1;position:relative;transition:.2s}
+.switch::after{content:"";position:absolute;width:18px;height:18px;top:3px;left:3px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:.2s}
+.duty:not(.off) .switch{background:var(--green)}.duty:not(.off) .switch::after{transform:translateX(20px)}
+.eyebrow{font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8}
+.ldp-usd{font-size:20px;font-weight:900;margin-top:4px}.ldp-rub{font-size:12px;color:#64748b;font-weight:700;margin-top:2px}
+.rrp{margin-top:10px;border:1px solid #ddd6fe;border-radius:16px;padding:12px;background:linear-gradient(135deg,#f5f3ff,#eef2ff);display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;width:100%}
+.rrp-main{min-width:0}.rrp-value{font-size:19px;font-weight:900;margin-top:4px}.rrp-sub{font-size:11px;color:#64748b;margin-top:2px}
+.imu{padding:9px 12px;border-radius:999px;background:linear-gradient(90deg,var(--violet),var(--violet2));color:#fff;font-weight:900;min-width:86px;text-align:center}
+.more{font-size:20px;color:#94a3b8}
+details{margin-top:14px}.details-head{padding:14px 16px;display:flex;justify-content:space-between;align-items:center}.details-body{padding:14px;border-top:1px solid var(--line);background:#fbfcfe}
+.settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.setting{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}.setting span{font-size:12px;color:#64748b}.setting input{width:110px;height:34px;border:1px solid var(--line);border-radius:9px;padding:0 9px;text-align:right}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.45);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center;padding:12px}
+.overlay.show{display:flex}
+.modal{width:100%;max-width:520px;background:#fff;border-radius:24px 24px 18px 18px;padding:16px;max-height:86vh;overflow:auto;box-shadow:0 24px 60px rgba(15,23,42,.24)}
+.modal-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}
+.modal-title{font-size:16px;font-weight:900}.modal-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.close{width:36px;height:36px;border:0;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:22px}
+.rrp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rrp-option{border:1px solid;border-radius:14px;padding:11px;text-align:left}
+.rrp-option.ok{background:#ecfdf5;border-color:#bbf7d0}.rrp-option.bad{background:#fef2f2;border-color:#fecaca}
+.rrp-option.active{outline:2px solid #7c3aed}
+.rrp-option-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.rrp-price{font-weight:900}
+.badge{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:white;font-size:12px;font-weight:900}.ok .badge{background:#10b981}.bad .badge{background:#ef4444}
+.rrp-imu{font-size:12px;font-weight:900;margin-top:7px}.ok .rrp-imu{color:#047857}.bad .rrp-imu{color:#b91c1c}
+
+.actions{display:flex;align-items:center;gap:8px}
+.pdf-btn{height:38px;border:0;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff;border-radius:12px;padding:0 13px;font-weight:800;box-shadow:0 6px 16px rgba(79,70,229,.2)}
+.pdf-btn:disabled{opacity:.6;cursor:wait}
+.report-form{display:grid;gap:12px}
+.report-label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#475569}
+.report-label textarea,.report-label input[type=file]{width:100%;border:1px solid var(--line);border-radius:12px;background:#f8fafc;padding:10px;font:inherit}
+.report-label textarea{min-height:92px;resize:vertical}
+.report-preview{display:none;max-height:180px;max-width:100%;border-radius:14px;border:1px solid var(--line);object-fit:contain;background:#f8fafc}
+.report-preview.show{display:block}
+.report-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.report-cancel,.report-download{height:40px;border-radius:12px;padding:0 14px;font-weight:800}
+.report-cancel{border:1px solid var(--line);background:#fff;color:#475569}
+.report-download{border:0;background:linear-gradient(90deg,#7c3aed,#4f46e5);color:#fff}
+.report-download:disabled{opacity:.6;cursor:wait}
+.report-status{min-height:18px;font-size:12px;color:#64748b}
+
+
+.mode-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px 0}
+.mode-label{font-size:12px;font-weight:800;color:#64748b}
+.mode-switcher{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;border-radius:14px;background:#f1f5f9;padding:4px}
+.mode-btn{height:36px;border:0;border-radius:10px;background:transparent;padding:0 12px;color:#64748b;font-size:12px;font-weight:850}
+.mode-btn.active{background:#fff;color:#111827;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.hidden{display:none!important}
+.reverse-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.reverse-card{border:1px solid #ddd6fe;border-radius:16px;padding:12px;background:linear-gradient(135deg,#f5f3ff,#eef2ff)}
+.reverse-card.fob{border-color:#bfdbfe;background:linear-gradient(135deg,#eff6ff,#eef2ff)}
+.reverse-title{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8}
+.reverse-value{margin-top:4px;font-size:20px;font-weight:900;color:#0f172a}
+.reverse-sub{margin-top:3px;font-size:11px;color:#64748b}
+.reverse-status{margin-top:10px;border-radius:12px;padding:9px 10px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:800}
+.reverse-status.bad{background:#fef2f2;color:#b91c1c}
+@media(max-width:650px){.mode-wrap{align-items:flex-start;flex-direction:column}.mode-switcher{width:100%}.reverse-grid{grid-template-columns:1fr}}
+
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+  main{padding:12px}.top{padding:10px 12px}.inputs{grid-template-columns:1fr;padding:12px}
+  .country{padding:12px}.mid{grid-template-columns:1fr}.settings{grid-template-columns:1fr}
+  .seg{width:118px}.rrp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">
+      <div class="logo">∑</div>
+      <div>
+        <h1>Калькулятор LDP / RRP / IMU</h1>
+        <div class="sub">Расчёт по странам и способам доставки</div>
+      </div>
+    </div>
+    <div class="actions"><button class="pdf-btn" id="openReport">PDF отчёт</button><button class="reset" id="reset">↻ Сбросить</button></div>
+  </div>
+</header>
+<main>
+  <section class="panel">
+    <div class="mode-wrap">
+      <div>
+        <div class="mode-label">Режим расчёта</div>
+        <div class="sub">Переключение не меняет исходную формулу LDP</div>
+      </div>
+      <div class="mode-switcher">
+        <button class="mode-btn active" id="modeForward" type="button">По FOB</button>
+        <button class="mode-btn" id="modeReverse" type="button">По RRP</button>
+      </div>
+    </div>
+    <div class="inputs">
+      <div class="field"><label>TG</label><select id="tg"><option>KNIT TOPS</option><option>OTHER</option></select></div>
+      <div class="field" id="fobField"><label>FOB</label><div class="wrap"><input id="fob" inputmode="decimal" value="1.99"><span class="suffix">$</span></div></div>
+      <div class="field hidden" id="reverseRrpField"><label>RRP для обратного расчёта</label><select id="reverseRrp"></select></div>
+      <div class="field"><label>Garment Weight</label><div class="wrap"><input id="weight" inputmode="decimal" value="0.095"><span class="suffix">кг</span></div></div>
+    </div>
+  </section>
+
+  <section id="countries" class="grid"></section>
+
+  <details class="panel">
+    <summary class="details-head"><strong>Подробные настройки</strong><span>⌄</span></summary>
+    <div class="details-body">
+      <div class="settings">
+        <label class="setting"><span>Gross factor</span><input id="grossFactor" value="1.11"></label>
+        <label class="setting"><span>Load Norm</span><input id="loadNorm" value="10000"></label>
+        <label class="setting"><span>USD / RUB</span><input id="usdRub" value="87"></label>
+        <label class="setting"><span>EUR на 1 USD</span><input id="eurPerUsd" value="0.855"></label>
+        <label class="setting"><span>НДС, %</span><input id="vat" value="10"></label>
+        <label class="setting"><span>Certification, %</span><input id="cert" value="0.3"></label>
+        <label class="setting"><span>Системная надбавка, ₽</span><input id="markup" value="0.6"></label>
+        <label class="setting"><span>Целевой IMU, %</span><input id="targetImu" value="71.7"></label>
+      </div>
+    </div>
+  </details>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">RRP и IMU</div>
+        <div class="modal-sub">Зелёные варианты проходят целевой IMU. Выберите другой RRP, чтобы сравнить IMU при другой розничной цене.</div>
+      </div>
+      <button class="close" id="close">×</button>
+    </div>
+    <div id="rrpGrid" class="rrp-grid"></div>
+  </div>
+</div>
+
+<div class="overlay" id="reportOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Выгрузка отчёта PDF</div>
+        <div class="modal-sub">Текст и изображение модели одежды необязательны. Отчёт сформируется и без них.</div>
+      </div>
+      <button class="close" id="reportClose">×</button>
+    </div>
+    <div class="report-form">
+      <label class="report-label">
+        <span>Модель одежды — текст или комментарий</span>
+        <textarea id="reportModelText" placeholder="Например: женская футболка oversize, модель SS26-014"></textarea>
+      </label>
+      <label class="report-label">
+        <span>Изображение модели одежды</span>
+        <input id="reportImageInput" type="file" accept="image/*">
+      </label>
+      <img id="reportImagePreview" class="report-preview" alt="Предпросмотр модели одежды">
+      <div id="reportStatus" class="report-status"></div>
+      <div class="report-actions">
+        <button class="report-cancel" id="reportCancel" type="button">Отмена</button>
+        <button class="report-download" id="downloadReport" type="button">Скачать PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROUTES=[
+{id:"bd-land",country:"Бангладеш",type:"Land",way:"Sea-Truck",days:65,borderRate:2050,fullRate:9161.9736,unit:"container"},
+{id:"bd-fast",country:"Бангладеш",type:"Fast",way:"Sea-Air",days:57,borderRate:2050,fullRate:23660.4319,unit:"container"},
+{id:"bd-air",country:"Бангладеш",type:"Air",way:"Air",days:20,borderRate:2.9064,fullRate:4.1525,unit:"kg"},
+{id:"cn-land",country:"Китай",type:"Land",way:"Sea-Train",days:50,borderRate:2560,fullRate:7059.5775,unit:"container"},
+{id:"cn-fast",country:"Китай",type:"Fast",way:"Sea-Truck",days:44,borderRate:2230,fullRate:9227.7,unit:"container"},
+{id:"cn-air",country:"Китай",type:"Air",way:"Air",days:18,borderRate:5.0311,fullRate:7.2285,unit:"kg"},
+{id:"in-land",country:"Индия",type:"Land",way:"Sea(Hub/Reel)",days:59,borderRate:5950,fullRate:7753,unit:"container"},
+{id:"in-fast",country:"Индия",type:"Fast",way:"Sea-Truck",days:79,borderRate:2600,fullRate:9528,unit:"container"},
+{id:"in-air",country:"Индия",type:"Air",way:"Air",days:20,borderRate:5.42,fullRate:7.49,unit:"kg"},
+{id:"vn-land",country:"Вьетнам",type:"Land",way:"Sea-Train",days:50,borderRate:2287.5,fullRate:7145.5689,unit:"container"},
+{id:"vn-fast",country:"Вьетнам",type:"Fast",way:"Sea-Truck",days:44,borderRate:1950,fullRate:9306.1914,unit:"container"},
+{id:"vn-air",country:"Вьетнам",type:"Air",way:"Air",days:17,borderRate:3.8312,fullRate:5.2404,unit:"kg"}];
+const COUNTRIES=["Бангладеш","Китай","Индия","Вьетнам"];
+const ALL_RRP=[499,599,699,799,899,999,1199,1299,1399,1499,1599,1699,1799,1899,1999];
+const state={mode:"forward",routes:{"Бангладеш":"bd-land","Китай":"cn-land","Индия":"in-land","Вьетнам":"vn-land"},dutyOn:{"Бангладеш":true,"Китай":true,"Индия":true,"Вьетнам":false},selected:{},popup:null};
+const fixedDuty={"Бангладеш":{percent:0,fixedEuroKg:1.75},"Китай":{percent:0,fixedEuroKg:1.75},"Индия":{percent:0,fixedEuroKg:1.75},"Вьетнам":{percent:0,fixedEuroKg:1.75}};
+const flags={
+"Бангладеш":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#006a4e"/><circle cx="13" cy="10" r="6" fill="#f42a41"/></svg>',
+"Китай":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><path d="M5 3.1l.75 2.25h2.37L6.2 6.75l.73 2.25L5 7.61 3.07 9l.73-2.25-1.92-1.4h2.37z" fill="#ffde00"/></svg>',
+"Индия":'<svg viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#ff9933"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.34" width="30" height="6.66" fill="#138808"/></svg>',
+"Вьетнам":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><path d="M15 4.1l1.39 4.27h4.49l-3.63 2.64 1.39 4.27L15 12.64l-3.64 2.64 1.39-4.27-3.63-2.64h4.49z" fill="#ff0"/></svg>'};
+const icon={Land:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><path d="M4 14h16l-2 4H6z"/><path d="M8 14V8h7v6"/><path d="M15 10h3"/></svg>',Fast:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',Air:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>'};
+const $=id=>document.getElementById(id); const num=v=>{const x=Number(String(v).replace(",", "."));return Number.isFinite(x)?x:0}; const usd=v=>`$${v.toFixed(4)}`; const rub=v=>`${v.toFixed(2)} ₽`; const pct=v=>`${(v*100).toFixed(2)}%`;
+function rrpValues(){return $("tg").value==="KNIT TOPS"?ALL_RRP.filter(v=>v<=1299):ALL_RRP}
+function target(){return num($("targetImu").value)/100}
+function calc(country){
+ const route=ROUTES.find(r=>r.id===state.routes[country])||ROUTES.find(r=>r.country===country), f=num($("fob").value), w=num($("weight").value), gross=w*num($("grossFactor").value), load=Math.max(num($("loadNorm").value),1), usdRub=Math.max(num($("usdRub").value),.0001), eur=Math.max(num($("eurPerUsd").value),.0001), vat=1+num($("vat").value)/100;
+ const freightBorder=route.unit==="kg"?gross*route.borderRate:gross*route.borderRate/load, freight=route.unit==="kg"?gross*route.fullRate:gross*route.fullRate/load;
+ const currentDuty=fixedDuty[country], percentDuty=(f+freightBorder)*(num(currentDuty.percent)/100), euroDuty=w*num(currentDuty.fixedEuroKg)/eur, finalDuty=state.dutyOn[country]?Math.max(percentDuty,euroDuty):0;
+ const certification=f*num($("cert").value)/100, ldp=f+finalDuty+freight+certification+num($("markup").value)/usdRub, ldpRub=ldp*usdRub;
+ const values=rrpValues(), opts=values.map(rrp=>({rrp,imu:1-ldpRub/(rrp/vat)})), rec=(opts.find(o=>o.imu>target())||{}).rrp||null, selectedCandidate=state.selected[country], selected=values.includes(selectedCandidate)?selectedCandidate:(rec||values[values.length-1]);
+ return {country,route,ldp,ldpRub,opts,rec,selected,imu:opts.find(o=>o.rrp===selected).imu};
+}
+function ldpForFob(country,fobValue){
+ const route=ROUTES.find(r=>r.id===state.routes[country])||ROUTES.find(r=>r.country===country),w=num($("weight").value),gross=w*num($("grossFactor").value),load=Math.max(num($("loadNorm").value),1),usdRub=Math.max(num($("usdRub").value),.0001),eur=Math.max(num($("eurPerUsd").value),.0001);
+ const freightBorder=route.unit==="kg"?gross*route.borderRate:gross*route.borderRate/load,freight=route.unit==="kg"?gross*route.fullRate:gross*route.fullRate/load;
+ const currentDuty=fixedDuty[country],percentDuty=(fobValue+freightBorder)*(num(currentDuty.percent)/100),euroDuty=w*num(currentDuty.fixedEuroKg)/eur,finalDuty=state.dutyOn[country]?Math.max(percentDuty,euroDuty):0;
+ const certification=fobValue*num($("cert").value)/100;
+ return fobValue+finalDuty+freight+certification+num($("markup").value)/usdRub
+}
+function solveMaxFob(country,maxLdp){
+ const baseLdp=ldpForFob(country,0);
+ if(maxLdp<baseLdp)return {possible:false,maxFob:0,baseLdp};
+ let low=0,high=Math.max(maxLdp,1);
+ while(ldpForFob(country,high)<maxLdp&&high<100000)high*=2;
+ for(let i=0;i<56;i++){const mid=(low+high)/2;if(ldpForFob(country,mid)<=maxLdp)low=mid;else high=mid}
+ return {possible:true,maxFob:low,baseLdp}
+}
+function reverseCalc(country){
+ const values=rrpValues(),selectedRrp=Math.max(num($("reverseRrp").value),0),index=Math.max(values.indexOf(selectedRrp),0),previousRrp=index>0?values[index-1]:null;
+ const usdRub=Math.max(num($("usdRub").value),.0001),vat=1+num($("vat").value)/100;
+ const maxLdpRub=(selectedRrp/vat)*(1-target()),maxLdp=maxLdpRub/usdRub,current=solveMaxFob(country,maxLdp);
+ const previousMaxLdpRub=previousRrp?(previousRrp/vat)*(1-target()):0,previousMaxLdp=previousMaxLdpRub/usdRub,previous=previousRrp?solveMaxFob(country,previousMaxLdp):{possible:true,maxFob:0,baseLdp:current.baseLdp};
+ const minFob=previous.possible?previous.maxFob:0,maxFob=current.maxFob,possible=current.possible;
+ const route=ROUTES.find(r=>r.id===state.routes[country])||ROUTES.find(r=>r.country===country);
+ return {country,route,rrp:selectedRrp,previousRrp,maxLdp,maxLdpRub,previousMaxLdp,previousMaxLdpRub,minFob,maxFob,baseLdp:current.baseLdp,possible}
+}
+function refreshRrpSuggestions(){
+ const select=$("reverseRrp"),current=Number(select.value)||799,values=rrpValues();
+ select.innerHTML=values.map(value=>`<option value="${value}">${value} ₽</option>`).join("");
+ select.value=values.includes(current)?String(current):String(values.find(value=>value>=current)||values[values.length-1])
+}
+function setMode(mode){
+ state.mode=mode;
+ $("modeForward").classList.toggle("active",mode==="forward");
+ $("modeReverse").classList.toggle("active",mode==="reverse");
+ $("fobField").classList.toggle("hidden",mode!=="forward");
+ $("reverseRrpField").classList.toggle("hidden",mode!=="reverse");
+ render()
+}
+function render(){
+ if(state.mode==="reverse"){
+  $("countries").innerHTML=COUNTRIES.map(c=>{const r=reverseCalc(c);return `<article class="country">
+ <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} · ${r.route.days} дн.</div></div></div>
+ <div class="seg">${["Land","Fast","Air"].map(t=>`<button class="${r.route.type===t?"active":""}" data-route="${c}|${t}" title="${t}">${icon[t]}</button>`).join("")}</div></div>
+ <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">Пошлина</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Вкл.":"Выкл."}</span><span class="switch"></span></div></button>
+ <div class="ldp"><div class="eyebrow">RRP</div><div class="ldp-usd">${r.rrp.toFixed(0)} ₽</div><div class="ldp-rub">Целевой IMU: ${pct(target())}</div></div></div>
+ <div class="reverse-grid">
+  <div class="reverse-card"><div class="reverse-title">Диапазон LDP</div><div class="reverse-value">${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"—"}</div><div class="reverse-sub">${r.previousRrp?`Граница между ${r.previousRrp} ₽ и ${r.rrp} ₽`:`Нижняя граница для ${r.rrp} ₽`}</div></div>
+  <div class="reverse-card fob"><div class="reverse-title">Диапазон FOB</div><div class="reverse-value">${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"—"}</div><div class="reverse-sub">${r.previousRrp?`FOB для перехода с ${r.previousRrp} ₽ на ${r.rrp} ₽`:`FOB до верхней границы ${r.rrp} ₽`}</div></div>
+ </div>
+ <div class="reverse-status ${r.possible?"":"bad"}">${r.possible?"Показан диапазон FOB для выбранной ценовой ступени RRP.":"Даже при FOB = $0 целевой IMU недостижим."}</div>
+ </article>`}).join("");
+ }else{
+  $("countries").innerHTML=COUNTRIES.map(c=>{const r=calc(c);return `<article class="country">
+ <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} · ${r.route.days} дн.</div></div></div>
+ <div class="seg">${["Land","Fast","Air"].map(t=>`<button class="${r.route.type===t?"active":""}" data-route="${c}|${t}" title="${t}">${icon[t]}</button>`).join("")}</div></div>
+ <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">Пошлина</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Вкл.":"Выкл."}</span><span class="switch"></span></div></button>
+ <div class="ldp"><div class="eyebrow">LDP</div><div class="ldp-usd">${usd(r.ldp)}</div><div class="ldp-rub">${rub(r.ldpRub)}</div></div></div>
+ <button class="rrp" data-open="${c}"><div class="rrp-main"><div class="eyebrow">Min RRP</div><div class="rrp-value">${r.rec?r.rec+" ₽":"—"}</div><div class="rrp-sub">Выбранный RRP: ${r.selected} ₽</div></div><div style="display:flex;align-items:center;gap:8px"><div class="imu">${pct(r.imu)}</div><div class="more">›</div></div></button>
+ </article>`}).join("");
+ }
+ document.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>{const [c,t]=b.dataset.route.split("|");state.routes[c]=ROUTES.find(r=>r.country===c&&r.type===t).id;render()});
+ document.querySelectorAll("[data-duty]").forEach(b=>b.onclick=()=>{const c=b.dataset.duty;state.dutyOn[c]=!state.dutyOn[c];render()});
+ document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openPopup(b.dataset.open));
+}
+function openPopup(c){state.popup=c;const r=calc(c);$("rrpGrid").innerHTML=r.opts.map(o=>`<button class="rrp-option ${o.imu>target()?"ok":"bad"} ${o.rrp===r.selected?"active":""}" data-pick="${c}|${o.rrp}"><div class="rrp-option-top"><span class="rrp-price">${o.rrp} ₽</span><span class="badge">${o.imu>target()?"✓":"×"}</span></div><div class="rrp-imu">${pct(o.imu)}</div></button>`).join("");$("overlay").classList.add("show");document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{const [cc,p]=b.dataset.pick.split("|");state.selected[cc]=Number(p);closePopup();render()})}
+function closePopup(){$("overlay").classList.remove("show");state.popup=null}
+["fob","weight","grossFactor","loadNorm","usdRub","eurPerUsd","vat","cert","markup","targetImu"].forEach(id=>$(id).addEventListener("input",render));
+$("reverseRrp").addEventListener("change",render);
+$("tg").addEventListener("change",()=>{state.selected={};refreshRrpSuggestions();render()});
+$("modeForward").onclick=()=>setMode("forward");$("modeReverse").onclick=()=>setMode("reverse");
+$("close").onclick=closePopup;$("overlay").onclick=e=>{if(e.target===$("overlay"))closePopup()};
+
+let reportImageData="";
+function loadScriptOnce(src,id){
+ return new Promise((resolve,reject)=>{
+  if(document.getElementById(id)){resolve();return}
+  const s=document.createElement("script");s.id=id;s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("Не удалось загрузить библиотеку PDF"));document.head.appendChild(s)
+ })
+}
+function escapeHtml(value){
+ return String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))
+}
+function reportRows(){
+ if(state.mode==="reverse"){
+  return COUNTRIES.map(country=>{const r=reverseCalc(country);return `<tr>
+    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} · ${r.route.days} дн.</td><td>${state.dutyOn[country]?"Вкл.":"Выкл."}</td>
+    <td>${r.rrp.toFixed(0)} ₽</td><td>${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"—"}</td><td>${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"—"}</td>
+  </tr>`}).join("")
+ }
+ return COUNTRIES.map(country=>{const r=calc(country);return `<tr>
+    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} · ${r.route.days} дн.</td><td>${state.dutyOn[country]?"Вкл.":"Выкл."}</td>
+    <td>${usd(r.ldp)}</td><td>${rub(r.ldpRub)}</td><td>${r.rec?r.rec+" ₽":"—"}</td><td>${r.selected} ₽</td><td>${pct(r.imu)}</td>
+  </tr>`}).join("")
+}
+function reportHead(){
+ return state.mode==="reverse"
+ ?"<tr><th>Страна</th><th>Доставка</th><th>Пошлина</th><th>RRP</th><th>Макс. LDP USD</th><th>Макс. LDP RUB</th><th>Макс. FOB</th></tr>"
+ :"<tr><th>Страна</th><th>Доставка</th><th>Пошлина</th><th>LDP USD</th><th>LDP RUB</th><th>Min RRP</th><th>Выбранный RRP</th><th>IMU</th></tr>"
+}
+function buildReportElement(){
+ const text=$("reportModelText").value.trim();
+ const container=document.createElement("div");
+ container.style.cssText="position:fixed;left:-10000px;top:0;width:794px;background:#fff;color:#0f172a;padding:34px;font-family:Arial,sans-serif;font-size:13px;line-height:1.45";
+ container.innerHTML=`<style>
+  .pdf-title{font-size:24px;font-weight:800;margin:0}.pdf-muted{color:#64748b}.pdf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.pdf-kpi{border:1px solid #e2e8f0;border-radius:10px;padding:10px}.pdf-kpi b{display:block;margin-top:4px;font-size:15px}.pdf-model{display:flex;gap:16px;align-items:flex-start;margin:16px 0}.pdf-model img{width:170px;max-height:190px;object-fit:contain;border:1px solid #e2e8f0;border-radius:10px}.pdf-note{white-space:pre-wrap;border:1px solid #e2e8f0;border-radius:10px;padding:12px;background:#f8fafc;flex:1;min-height:76px}.pdf-table{width:100%;border-collapse:collapse;margin-top:18px;font-size:11px}.pdf-table th,.pdf-table td{border:1px solid #e2e8f0;padding:7px;text-align:left;vertical-align:top}.pdf-table th{background:#f1f5f9;font-weight:800}.pdf-footer{margin-top:14px;font-size:10px;color:#64748b}
+ </style>
+ <h1 class="pdf-title">Отчёт LDP / RRP / IMU</h1>
+ <div class="pdf-muted">Сформирован: ${new Date().toLocaleString("ru-RU")}</div>
+ <div class="pdf-grid">
+   <div class="pdf-kpi"><span class="pdf-muted">Режим</span><b>${state.mode==="reverse"?"По RRP":"По FOB"}</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">${state.mode==="reverse"?"RRP":"FOB"}</span><b>${state.mode==="reverse"?escapeHtml($("reverseRrp").value)+" ₽":escapeHtml($("fob").value)+" $"}</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Garment Weight</span><b>${escapeHtml($("weight").value)} кг</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Целевой IMU</span><b>${escapeHtml($("targetImu").value)}%</b></div>
+ </div>
+ ${(text||reportImageData)?`<div class="pdf-model">${reportImageData?`<img src="${reportImageData}" alt="">`:""}${text?`<div class="pdf-note">${escapeHtml(text)}</div>`:""}</div>`:""}
+ <table class="pdf-table">
+  <thead>${reportHead()}</thead>
+  <tbody>${reportRows()}</tbody>
+ </table>
+ <div class="pdf-footer">Расчёт сформирован калькулятором LDP / RRP / IMU.</div>`;
+ document.body.appendChild(container);
+ return container
+}
+async function exportReportPdf(){
+ const btn=$("downloadReport"),status=$("reportStatus");
+ btn.disabled=true;status.textContent="Формируем PDF…";
+ let report=null;
+ try{
+  await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js","html2canvas-lib");
+  await loadScriptOnce("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js","jspdf-lib");
+  report=buildReportElement();
+  if(reportImageData){await new Promise(resolve=>setTimeout(resolve,120))}
+  const canvas=await window.html2canvas(report,{scale:2,useCORS:true,backgroundColor:"#ffffff",logging:false});
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF("p","mm","a4");
+  const pageW=210,pageH=297,margin=8,imgW=pageW-margin*2,imgH=canvas.height*imgW/canvas.width;
+  const data=canvas.toDataURL("image/jpeg",0.93);
+  let y=margin,remaining=imgH;
+  pdf.addImage(data,"JPEG",margin,y,imgW,imgH);
+  remaining-=pageH-margin*2;
+  while(remaining>0){
+   pdf.addPage();
+   y=margin-(imgH-remaining);
+   pdf.addImage(data,"JPEG",margin,y,imgW,imgH);
+   remaining-=pageH-margin*2
+  }
+  const stamp=new Date().toISOString().slice(0,10);
+  pdf.save(`ldp-rrp-imu-report-${stamp}.pdf`);
+  status.textContent="PDF сформирован.";
+  setTimeout(()=>{$("reportOverlay").classList.remove("show");status.textContent=""},450)
+ }catch(err){
+  console.error(err);
+  status.textContent="Не удалось сформировать PDF. Проверьте подключение к интернету и повторите."
+ }finally{
+  if(report)report.remove();
+  btn.disabled=false
+ }
+}
+$("openReport").onclick=()=>{$("reportOverlay").classList.add("show")};
+$("reportClose").onclick=()=>{$("reportOverlay").classList.remove("show")};
+$("reportCancel").onclick=()=>{$("reportOverlay").classList.remove("show")};
+$("reportOverlay").onclick=e=>{if(e.target===$("reportOverlay"))$("reportOverlay").classList.remove("show")};
+$("reportImageInput").onchange=e=>{
+ const file=e.target.files&&e.target.files[0],preview=$("reportImagePreview");
+ if(!file){reportImageData="";preview.src="";preview.classList.remove("show");return}
+ const reader=new FileReader();
+ reader.onload=()=>{reportImageData=reader.result;preview.src=reportImageData;preview.classList.add("show")};
+ reader.readAsDataURL(file)
+};
+$("downloadReport").onclick=exportReportPdf;
+
+$("reset").onclick=()=>{state.routes={"Бангладеш":"bd-land","Китай":"cn-land","Индия":"in-land","Вьетнам":"vn-land"};state.dutyOn={"Бангладеш":true,"Китай":true,"Индия":true,"Вьетнам":false};state.selected={};$("tg").value="KNIT TOPS";$("fob").value="1.99";refreshRrpSuggestions();$("reverseRrp").value="799";$("weight").value="0.095";$("targetImu").value="71.7";refreshRrpSuggestions();setMode("forward")};
+refreshRrpSuggestions();render();
+</script>
+</body>
+</html>
