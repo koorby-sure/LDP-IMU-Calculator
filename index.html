@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>РљР°Р»СЊРєСѓР»СЏС‚РѕСЂ LDP / RRP / IMU вЂ” restored baseline</title>
+<title>Калькулятор LDP / RRP / IMU — restored baseline</title>
 <style>
 :root{
   --bg:#f6f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;
@@ -115,49 +115,49 @@ details{margin-top:14px}.details-head{padding:14px 16px;display:flex;justify-con
 <header>
   <div class="top">
     <div class="brand">
-      <div class="logo">в€‘</div>
+      <div class="logo">∑</div>
       <div>
-        <h1>РљР°Р»СЊРєСѓР»СЏС‚РѕСЂ LDP / RRP / IMU</h1>
-        <div class="sub">Р Р°СЃС‡С‘С‚ РїРѕ СЃС‚СЂР°РЅР°Рј Рё СЃРїРѕСЃРѕР±Р°Рј РґРѕСЃС‚Р°РІРєРё</div>
+        <h1>Калькулятор LDP / RRP / IMU</h1>
+        <div class="sub">Расчёт по странам и способам доставки</div>
       </div>
     </div>
-    <div class="actions"><button class="pdf-btn" id="openReport">PDF РѕС‚С‡С‘С‚</button><button class="reset" id="reset">в†» РЎР±СЂРѕСЃРёС‚СЊ</button></div>
+    <div class="actions"><button class="pdf-btn" id="openReport">PDF отчёт</button><button class="reset" id="reset">↻ Сбросить</button></div>
   </div>
 </header>
 <main>
   <section class="panel">
     <div class="mode-wrap">
       <div>
-        <div class="mode-label">Р РµР¶РёРј СЂР°СЃС‡С‘С‚Р°</div>
-        <div class="sub">РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РЅРµ РјРµРЅСЏРµС‚ РёСЃС…РѕРґРЅСѓСЋ С„РѕСЂРјСѓР»Сѓ LDP</div>
+        <div class="mode-label">Режим расчёта</div>
+        <div class="sub">Переключение не меняет исходную формулу LDP</div>
       </div>
       <div class="mode-switcher">
-        <button class="mode-btn active" id="modeForward" type="button">РџРѕ FOB</button>
-        <button class="mode-btn" id="modeReverse" type="button">РџРѕ RRP</button>
+        <button class="mode-btn active" id="modeForward" type="button">По FOB</button>
+        <button class="mode-btn" id="modeReverse" type="button">По RRP</button>
       </div>
     </div>
     <div class="inputs">
       <div class="field"><label>TG</label><select id="tg"><option>KNIT TOPS</option><option>OTHER</option></select></div>
       <div class="field" id="fobField"><label>FOB</label><div class="wrap"><input id="fob" inputmode="decimal" value="1.99"><span class="suffix">$</span></div></div>
-      <div class="field hidden" id="reverseRrpField"><label>RRP РґР»СЏ РѕР±СЂР°С‚РЅРѕРіРѕ СЂР°СЃС‡С‘С‚Р°</label><select id="reverseRrp"></select></div>
-      <div class="field"><label>Garment Weight</label><div class="wrap"><input id="weight" inputmode="decimal" value="0.095"><span class="suffix">РєРі</span></div></div>
+      <div class="field hidden" id="reverseRrpField"><label>RRP для обратного расчёта</label><select id="reverseRrp"></select></div>
+      <div class="field"><label>Garment Weight</label><div class="wrap"><input id="weight" inputmode="decimal" value="0.095"><span class="suffix">кг</span></div></div>
     </div>
   </section>
 
   <section id="countries" class="grid"></section>
 
   <details class="panel">
-    <summary class="details-head"><strong>РџРѕРґСЂРѕР±РЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё</strong><span>вЊ„</span></summary>
+    <summary class="details-head"><strong>Подробные настройки</strong><span>⌄</span></summary>
     <div class="details-body">
       <div class="settings">
         <label class="setting"><span>Gross factor</span><input id="grossFactor" value="1.11"></label>
         <label class="setting"><span>Load Norm</span><input id="loadNorm" value="10000"></label>
         <label class="setting"><span>USD / RUB</span><input id="usdRub" value="87"></label>
-        <label class="setting"><span>EUR РЅР° 1 USD</span><input id="eurPerUsd" value="0.855"></label>
-        <label class="setting"><span>РќР”РЎ, %</span><input id="vat" value="10"></label>
+        <label class="setting"><span>EUR на 1 USD</span><input id="eurPerUsd" value="0.855"></label>
+        <label class="setting"><span>НДС, %</span><input id="vat" value="10"></label>
         <label class="setting"><span>Certification, %</span><input id="cert" value="0.3"></label>
-        <label class="setting"><span>РЎРёСЃС‚РµРјРЅР°СЏ РЅР°РґР±Р°РІРєР°, в‚Ѕ</span><input id="markup" value="0.6"></label>
-        <label class="setting"><span>Р¦РµР»РµРІРѕР№ IMU, %</span><input id="targetImu" value="71.7"></label>
+        <label class="setting"><span>Системная надбавка, ₽</span><input id="markup" value="0.6"></label>
+        <label class="setting"><span>Целевой IMU, %</span><input id="targetImu" value="71.7"></label>
       </div>
     </div>
   </details>
@@ -167,10 +167,10 @@ details{margin-top:14px}.details-head{padding:14px 16px;display:flex;justify-con
   <div class="modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title">RRP Рё IMU</div>
-        <div class="modal-sub">Р—РµР»С‘РЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РїСЂРѕС…РѕРґСЏС‚ С†РµР»РµРІРѕР№ IMU. Р’С‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕР№ RRP, С‡С‚РѕР±С‹ СЃСЂР°РІРЅРёС‚СЊ IMU РїСЂРё РґСЂСѓРіРѕР№ СЂРѕР·РЅРёС‡РЅРѕР№ С†РµРЅРµ.</div>
+        <div class="modal-title">RRP и IMU</div>
+        <div class="modal-sub">Зелёные варианты проходят целевой IMU. Выберите другой RRP, чтобы сравнить IMU при другой розничной цене.</div>
       </div>
-      <button class="close" id="close">Г—</button>
+      <button class="close" id="close">×</button>
     </div>
     <div id="rrpGrid" class="rrp-grid"></div>
   </div>
@@ -180,25 +180,25 @@ details{margin-top:14px}.details-head{padding:14px 16px;display:flex;justify-con
   <div class="modal">
     <div class="modal-head">
       <div>
-        <div class="modal-title">Р’С‹РіСЂСѓР·РєР° РѕС‚С‡С‘С‚Р° PDF</div>
-        <div class="modal-sub">РўРµРєСЃС‚ Рё РёР·РѕР±СЂР°Р¶РµРЅРёРµ РјРѕРґРµР»Рё РѕРґРµР¶РґС‹ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹. РћС‚С‡С‘С‚ СЃС„РѕСЂРјРёСЂСѓРµС‚СЃСЏ Рё Р±РµР· РЅРёС….</div>
+        <div class="modal-title">Выгрузка отчёта PDF</div>
+        <div class="modal-sub">Текст и изображение модели одежды необязательны. Отчёт сформируется и без них.</div>
       </div>
-      <button class="close" id="reportClose">Г—</button>
+      <button class="close" id="reportClose">×</button>
     </div>
     <div class="report-form">
       <label class="report-label">
-        <span>РњРѕРґРµР»СЊ РѕРґРµР¶РґС‹ вЂ” С‚РµРєСЃС‚ РёР»Рё РєРѕРјРјРµРЅС‚Р°СЂРёР№</span>
-        <textarea id="reportModelText" placeholder="РќР°РїСЂРёРјРµСЂ: Р¶РµРЅСЃРєР°СЏ С„СѓС‚Р±РѕР»РєР° oversize, РјРѕРґРµР»СЊ SS26-014"></textarea>
+        <span>Модель одежды — текст или комментарий</span>
+        <textarea id="reportModelText" placeholder="Например: женская футболка oversize, модель SS26-014"></textarea>
       </label>
       <label class="report-label">
-        <span>РР·РѕР±СЂР°Р¶РµРЅРёРµ РјРѕРґРµР»Рё РѕРґРµР¶РґС‹</span>
+        <span>Изображение модели одежды</span>
         <input id="reportImageInput" type="file" accept="image/*">
       </label>
-      <img id="reportImagePreview" class="report-preview" alt="РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ РјРѕРґРµР»Рё РѕРґРµР¶РґС‹">
+      <img id="reportImagePreview" class="report-preview" alt="Предпросмотр модели одежды">
       <div id="reportStatus" class="report-status"></div>
       <div class="report-actions">
-        <button class="report-cancel" id="reportCancel" type="button">РћС‚РјРµРЅР°</button>
-        <button class="report-download" id="downloadReport" type="button">РЎРєР°С‡Р°С‚СЊ PDF</button>
+        <button class="report-cancel" id="reportCancel" type="button">Отмена</button>
+        <button class="report-download" id="downloadReport" type="button">Скачать PDF</button>
       </div>
     </div>
   </div>
@@ -206,29 +206,29 @@ details{margin-top:14px}.details-head{padding:14px 16px;display:flex;justify-con
 
 <script>
 const ROUTES=[
-{id:"bd-land",country:"Р‘Р°РЅРіР»Р°РґРµС€",type:"Land",way:"Sea-Truck",days:65,borderRate:2050,fullRate:9161.9736,unit:"container"},
-{id:"bd-fast",country:"Р‘Р°РЅРіР»Р°РґРµС€",type:"Fast",way:"Sea-Air",days:57,borderRate:2050,fullRate:23660.4319,unit:"container"},
-{id:"bd-air",country:"Р‘Р°РЅРіР»Р°РґРµС€",type:"Air",way:"Air",days:20,borderRate:2.9064,fullRate:4.1525,unit:"kg"},
-{id:"cn-land",country:"РљРёС‚Р°Р№",type:"Land",way:"Sea-Train",days:50,borderRate:2560,fullRate:7059.5775,unit:"container"},
-{id:"cn-fast",country:"РљРёС‚Р°Р№",type:"Fast",way:"Sea-Truck",days:44,borderRate:2230,fullRate:9227.7,unit:"container"},
-{id:"cn-air",country:"РљРёС‚Р°Р№",type:"Air",way:"Air",days:18,borderRate:5.0311,fullRate:7.2285,unit:"kg"},
-{id:"in-land",country:"РРЅРґРёСЏ",type:"Land",way:"Sea(Hub/Reel)",days:59,borderRate:5950,fullRate:7753,unit:"container"},
-{id:"in-fast",country:"РРЅРґРёСЏ",type:"Fast",way:"Sea-Truck",days:79,borderRate:2600,fullRate:9528,unit:"container"},
-{id:"in-air",country:"РРЅРґРёСЏ",type:"Air",way:"Air",days:20,borderRate:5.42,fullRate:7.49,unit:"kg"},
-{id:"vn-land",country:"Р’СЊРµС‚РЅР°Рј",type:"Land",way:"Sea-Train",days:50,borderRate:2287.5,fullRate:7145.5689,unit:"container"},
-{id:"vn-fast",country:"Р’СЊРµС‚РЅР°Рј",type:"Fast",way:"Sea-Truck",days:44,borderRate:1950,fullRate:9306.1914,unit:"container"},
-{id:"vn-air",country:"Р’СЊРµС‚РЅР°Рј",type:"Air",way:"Air",days:17,borderRate:3.8312,fullRate:5.2404,unit:"kg"}];
-const COUNTRIES=["Р‘Р°РЅРіР»Р°РґРµС€","РљРёС‚Р°Р№","РРЅРґРёСЏ","Р’СЊРµС‚РЅР°Рј"];
+{id:"bd-land",country:"Бангладеш",type:"Land",way:"Sea-Truck",days:65,borderRate:2050,fullRate:9161.9736,unit:"container"},
+{id:"bd-fast",country:"Бангладеш",type:"Fast",way:"Sea-Air",days:57,borderRate:2050,fullRate:23660.4319,unit:"container"},
+{id:"bd-air",country:"Бангладеш",type:"Air",way:"Air",days:20,borderRate:2.9064,fullRate:4.1525,unit:"kg"},
+{id:"cn-land",country:"Китай",type:"Land",way:"Sea-Train",days:50,borderRate:2560,fullRate:7059.5775,unit:"container"},
+{id:"cn-fast",country:"Китай",type:"Fast",way:"Sea-Truck",days:44,borderRate:2230,fullRate:9227.7,unit:"container"},
+{id:"cn-air",country:"Китай",type:"Air",way:"Air",days:18,borderRate:5.0311,fullRate:7.2285,unit:"kg"},
+{id:"in-land",country:"Индия",type:"Land",way:"Sea(Hub/Reel)",days:59,borderRate:5950,fullRate:7753,unit:"container"},
+{id:"in-fast",country:"Индия",type:"Fast",way:"Sea-Truck",days:79,borderRate:2600,fullRate:9528,unit:"container"},
+{id:"in-air",country:"Индия",type:"Air",way:"Air",days:20,borderRate:5.42,fullRate:7.49,unit:"kg"},
+{id:"vn-land",country:"Вьетнам",type:"Land",way:"Sea-Train",days:50,borderRate:2287.5,fullRate:7145.5689,unit:"container"},
+{id:"vn-fast",country:"Вьетнам",type:"Fast",way:"Sea-Truck",days:44,borderRate:1950,fullRate:9306.1914,unit:"container"},
+{id:"vn-air",country:"Вьетнам",type:"Air",way:"Air",days:17,borderRate:3.8312,fullRate:5.2404,unit:"kg"}];
+const COUNTRIES=["Бангладеш","Китай","Индия","Вьетнам"];
 const ALL_RRP=[499,599,699,799,899,999,1199,1299,1399,1499,1599,1699,1799,1899,1999];
-const state={mode:"forward",routes:{"Р‘Р°РЅРіР»Р°РґРµС€":"bd-land","РљРёС‚Р°Р№":"cn-land","РРЅРґРёСЏ":"in-land","Р’СЊРµС‚РЅР°Рј":"vn-land"},dutyOn:{"Р‘Р°РЅРіР»Р°РґРµС€":true,"РљРёС‚Р°Р№":true,"РРЅРґРёСЏ":true,"Р’СЊРµС‚РЅР°Рј":false},selected:{},popup:null};
-const fixedDuty={"Р‘Р°РЅРіР»Р°РґРµС€":{percent:0,fixedEuroKg:1.75},"РљРёС‚Р°Р№":{percent:0,fixedEuroKg:1.75},"РРЅРґРёСЏ":{percent:0,fixedEuroKg:1.75},"Р’СЊРµС‚РЅР°Рј":{percent:0,fixedEuroKg:1.75}};
+const state={mode:"forward",routes:{"Бангладеш":"bd-land","Китай":"cn-land","Индия":"in-land","Вьетнам":"vn-land"},dutyOn:{"Бангладеш":true,"Китай":true,"Индия":true,"Вьетнам":false},selected:{},popup:null};
+const fixedDuty={"Бангладеш":{percent:0,fixedEuroKg:1.75},"Китай":{percent:0,fixedEuroKg:1.75},"Индия":{percent:0,fixedEuroKg:1.75},"Вьетнам":{percent:0,fixedEuroKg:1.75}};
 const flags={
-"Р‘Р°РЅРіР»Р°РґРµС€":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#006a4e"/><circle cx="13" cy="10" r="6" fill="#f42a41"/></svg>',
-"РљРёС‚Р°Р№":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><path d="M5 3.1l.75 2.25h2.37L6.2 6.75l.73 2.25L5 7.61 3.07 9l.73-2.25-1.92-1.4h2.37z" fill="#ffde00"/></svg>',
-"РРЅРґРёСЏ":'<svg viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#ff9933"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.34" width="30" height="6.66" fill="#138808"/></svg>',
-"Р’СЊРµС‚РЅР°Рј":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><path d="M15 4.1l1.39 4.27h4.49l-3.63 2.64 1.39 4.27L15 12.64l-3.64 2.64 1.39-4.27-3.63-2.64h4.49z" fill="#ff0"/></svg>'};
+"Бангладеш":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#006a4e"/><circle cx="13" cy="10" r="6" fill="#f42a41"/></svg>',
+"Китай":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><path d="M5 3.1l.75 2.25h2.37L6.2 6.75l.73 2.25L5 7.61 3.07 9l.73-2.25-1.92-1.4h2.37z" fill="#ffde00"/></svg>',
+"Индия":'<svg viewBox="0 0 30 20"><rect width="30" height="6.67" fill="#ff9933"/><rect y="6.67" width="30" height="6.67" fill="#fff"/><rect y="13.34" width="30" height="6.66" fill="#138808"/></svg>',
+"Вьетнам":'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><path d="M15 4.1l1.39 4.27h4.49l-3.63 2.64 1.39 4.27L15 12.64l-3.64 2.64 1.39-4.27-3.63-2.64h4.49z" fill="#ff0"/></svg>'};
 const icon={Land:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18h18"/><path d="M4 14h16l-2 4H6z"/><path d="M8 14V8h7v6"/><path d="M15 10h3"/></svg>',Fast:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',Air:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>'};
-const $=id=>document.getElementById(id); const num=v=>{const x=Number(String(v).replace(",", "."));return Number.isFinite(x)?x:0}; const usd=v=>`$${v.toFixed(4)}`; const rub=v=>`${v.toFixed(2)} в‚Ѕ`; const pct=v=>`${(v*100).toFixed(2)}%`;
+const $=id=>document.getElementById(id); const num=v=>{const x=Number(String(v).replace(",", "."));return Number.isFinite(x)?x:0}; const usd=v=>`$${v.toFixed(4)}`; const rub=v=>`${v.toFixed(2)} ₽`; const pct=v=>`${(v*100).toFixed(2)}%`;
 function rrpValues(){return $("tg").value==="KNIT TOPS"?ALL_RRP.filter(v=>v<=1299):ALL_RRP}
 function target(){return num($("targetImu").value)/100}
 function calc(country){
@@ -265,7 +265,7 @@ function reverseCalc(country){
 }
 function refreshRrpSuggestions(){
  const select=$("reverseRrp"),current=Number(select.value)||799,values=rrpValues();
- select.innerHTML=values.map(value=>`<option value="${value}">${value} в‚Ѕ</option>`).join("");
+ select.innerHTML=values.map(value=>`<option value="${value}">${value} ₽</option>`).join("");
  select.value=values.includes(current)?String(current):String(values.find(value=>value>=current)||values[values.length-1])
 }
 function setMode(mode){
@@ -279,30 +279,30 @@ function setMode(mode){
 function render(){
  if(state.mode==="reverse"){
   $("countries").innerHTML=COUNTRIES.map(c=>{const r=reverseCalc(c);return `<article class="country">
- <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} В· ${r.route.days} РґРЅ.</div></div></div>
+ <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} · ${r.route.days} дн.</div></div></div>
  <div class="seg">${["Land","Fast","Air"].map(t=>`<button class="${r.route.type===t?"active":""}" data-route="${c}|${t}" title="${t}">${icon[t]}</button>`).join("")}</div></div>
- <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">РџРѕС€Р»РёРЅР°</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Р’РєР».":"Р’С‹РєР»."}</span><span class="switch"></span></div></button>
- <div class="ldp"><div class="eyebrow">RRP</div><div class="ldp-usd">${r.rrp.toFixed(0)} в‚Ѕ</div><div class="ldp-rub">Р¦РµР»РµРІРѕР№ IMU: ${pct(target())}</div></div></div>
+ <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">Пошлина</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Вкл.":"Выкл."}</span><span class="switch"></span></div></button>
+ <div class="ldp"><div class="eyebrow">RRP</div><div class="ldp-usd">${r.rrp.toFixed(0)} ₽</div><div class="ldp-rub">Целевой IMU: ${pct(target())}</div></div></div>
  <div class="reverse-grid">
-  <div class="reverse-card"><div class="reverse-title">Р”РёР°РїР°Р·РѕРЅ LDP</div><div class="reverse-value">${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"вЂ”"}</div><div class="reverse-sub">${r.previousRrp?`Р“СЂР°РЅРёС†Р° РјРµР¶РґСѓ ${r.previousRrp} в‚Ѕ Рё ${r.rrp} в‚Ѕ`:`РќРёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° РґР»СЏ ${r.rrp} в‚Ѕ`}</div></div>
-  <div class="reverse-card fob"><div class="reverse-title">Р”РёР°РїР°Р·РѕРЅ FOB</div><div class="reverse-value">${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"вЂ”"}</div><div class="reverse-sub">${r.previousRrp?`FOB РґР»СЏ РїРµСЂРµС…РѕРґР° СЃ ${r.previousRrp} в‚Ѕ РЅР° ${r.rrp} в‚Ѕ`:`FOB РґРѕ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†С‹ ${r.rrp} в‚Ѕ`}</div></div>
+  <div class="reverse-card"><div class="reverse-title">Диапазон LDP</div><div class="reverse-value">${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"—"}</div><div class="reverse-sub">${r.previousRrp?`Граница между ${r.previousRrp} ₽ и ${r.rrp} ₽`:`Нижняя граница для ${r.rrp} ₽`}</div></div>
+  <div class="reverse-card fob"><div class="reverse-title">Диапазон FOB</div><div class="reverse-value">${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"—"}</div><div class="reverse-sub">${r.previousRrp?`FOB для перехода с ${r.previousRrp} ₽ на ${r.rrp} ₽`:`FOB до верхней границы ${r.rrp} ₽`}</div></div>
  </div>
- <div class="reverse-status ${r.possible?"":"bad"}">${r.possible?"РџРѕРєР°Р·Р°РЅ РґРёР°РїР°Р·РѕРЅ FOB РґР»СЏ РІС‹Р±СЂР°РЅРЅРѕР№ С†РµРЅРѕРІРѕР№ СЃС‚СѓРїРµРЅРё RRP.":"Р”Р°Р¶Рµ РїСЂРё FOB = $0 С†РµР»РµРІРѕР№ IMU РЅРµРґРѕСЃС‚РёР¶РёРј."}</div>
+ <div class="reverse-status ${r.possible?"":"bad"}">${r.possible?"Показан диапазон FOB для выбранной ценовой ступени RRP.":"Даже при FOB = $0 целевой IMU недостижим."}</div>
  </article>`}).join("");
  }else{
   $("countries").innerHTML=COUNTRIES.map(c=>{const r=calc(c);return `<article class="country">
- <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} В· ${r.route.days} РґРЅ.</div></div></div>
+ <div class="country-head"><div class="country-main"><div class="flag">${flags[c]}</div><div><div class="name">${c}</div><div class="route">${r.route.way} · ${r.route.days} дн.</div></div></div>
  <div class="seg">${["Land","Fast","Air"].map(t=>`<button class="${r.route.type===t?"active":""}" data-route="${c}|${t}" title="${t}">${icon[t]}</button>`).join("")}</div></div>
- <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">РџРѕС€Р»РёРЅР°</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Р’РєР».":"Р’С‹РєР»."}</span><span class="switch"></span></div></button>
+ <div class="mid"><button class="duty ${state.dutyOn[c]?"":"off"}" data-duty="${c}"><div class="duty-title">Пошлина</div><div style="display:flex;align-items:center;gap:8px"><span class="duty-state">${state.dutyOn[c]?"Вкл.":"Выкл."}</span><span class="switch"></span></div></button>
  <div class="ldp"><div class="eyebrow">LDP</div><div class="ldp-usd">${usd(r.ldp)}</div><div class="ldp-rub">${rub(r.ldpRub)}</div></div></div>
- <button class="rrp" data-open="${c}"><div class="rrp-main"><div class="eyebrow">Min RRP</div><div class="rrp-value">${r.rec?r.rec+" в‚Ѕ":"вЂ”"}</div><div class="rrp-sub">Р’С‹Р±СЂР°РЅРЅС‹Р№ RRP: ${r.selected} в‚Ѕ</div></div><div style="display:flex;align-items:center;gap:8px"><div class="imu">${pct(r.imu)}</div><div class="more">вЂє</div></div></button>
+ <button class="rrp" data-open="${c}"><div class="rrp-main"><div class="eyebrow">Min RRP</div><div class="rrp-value">${r.rec?r.rec+" ₽":"—"}</div><div class="rrp-sub">Выбранный RRP: ${r.selected} ₽</div></div><div style="display:flex;align-items:center;gap:8px"><div class="imu">${pct(r.imu)}</div><div class="more">›</div></div></button>
  </article>`}).join("");
  }
  document.querySelectorAll("[data-route]").forEach(b=>b.onclick=()=>{const [c,t]=b.dataset.route.split("|");state.routes[c]=ROUTES.find(r=>r.country===c&&r.type===t).id;render()});
  document.querySelectorAll("[data-duty]").forEach(b=>b.onclick=()=>{const c=b.dataset.duty;state.dutyOn[c]=!state.dutyOn[c];render()});
  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openPopup(b.dataset.open));
 }
-function openPopup(c){state.popup=c;const r=calc(c);$("rrpGrid").innerHTML=r.opts.map(o=>`<button class="rrp-option ${o.imu>target()?"ok":"bad"} ${o.rrp===r.selected?"active":""}" data-pick="${c}|${o.rrp}"><div class="rrp-option-top"><span class="rrp-price">${o.rrp} в‚Ѕ</span><span class="badge">${o.imu>target()?"вњ“":"Г—"}</span></div><div class="rrp-imu">${pct(o.imu)}</div></button>`).join("");$("overlay").classList.add("show");document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{const [cc,p]=b.dataset.pick.split("|");state.selected[cc]=Number(p);closePopup();render()})}
+function openPopup(c){state.popup=c;const r=calc(c);$("rrpGrid").innerHTML=r.opts.map(o=>`<button class="rrp-option ${o.imu>target()?"ok":"bad"} ${o.rrp===r.selected?"active":""}" data-pick="${c}|${o.rrp}"><div class="rrp-option-top"><span class="rrp-price">${o.rrp} ₽</span><span class="badge">${o.imu>target()?"✓":"×"}</span></div><div class="rrp-imu">${pct(o.imu)}</div></button>`).join("");$("overlay").classList.add("show");document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{const [cc,p]=b.dataset.pick.split("|");state.selected[cc]=Number(p);closePopup();render()})}
 function closePopup(){$("overlay").classList.remove("show");state.popup=null}
 ["fob","weight","grossFactor","loadNorm","usdRub","eurPerUsd","vat","cert","markup","targetImu"].forEach(id=>$(id).addEventListener("input",render));
 $("reverseRrp").addEventListener("change",render);
@@ -314,7 +314,7 @@ let reportImageData="";
 function loadScriptOnce(src,id){
  return new Promise((resolve,reject)=>{
   if(document.getElementById(id)){resolve();return}
-  const s=document.createElement("script");s.id=id;s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ Р±РёР±Р»РёРѕС‚РµРєСѓ PDF"));document.head.appendChild(s)
+  const s=document.createElement("script");s.id=id;s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("Не удалось загрузить библиотеку PDF"));document.head.appendChild(s)
  })
 }
 function escapeHtml(value){
@@ -323,19 +323,19 @@ function escapeHtml(value){
 function reportRows(){
  if(state.mode==="reverse"){
   return COUNTRIES.map(country=>{const r=reverseCalc(country);return `<tr>
-    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} В· ${r.route.days} РґРЅ.</td><td>${state.dutyOn[country]?"Р’РєР».":"Р’С‹РєР»."}</td>
-    <td>${r.rrp.toFixed(0)} в‚Ѕ</td><td>${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"вЂ”"}</td><td>${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"вЂ”"}</td>
+    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} · ${r.route.days} дн.</td><td>${state.dutyOn[country]?"Вкл.":"Выкл."}</td>
+    <td>${r.rrp.toFixed(0)} ₽</td><td>${r.possible?`${usd(r.previousMaxLdp)} - ${usd(r.maxLdp)}`:"—"}</td><td>${r.possible?`${usd(r.minFob)} - ${usd(r.maxFob)}`:"—"}</td>
   </tr>`}).join("")
  }
  return COUNTRIES.map(country=>{const r=calc(country);return `<tr>
-    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} В· ${r.route.days} РґРЅ.</td><td>${state.dutyOn[country]?"Р’РєР».":"Р’С‹РєР»."}</td>
-    <td>${usd(r.ldp)}</td><td>${rub(r.ldpRub)}</td><td>${r.rec?r.rec+" в‚Ѕ":"вЂ”"}</td><td>${r.selected} в‚Ѕ</td><td>${pct(r.imu)}</td>
+    <td>${escapeHtml(country)}</td><td>${escapeHtml(r.route.way)} · ${r.route.days} дн.</td><td>${state.dutyOn[country]?"Вкл.":"Выкл."}</td>
+    <td>${usd(r.ldp)}</td><td>${rub(r.ldpRub)}</td><td>${r.rec?r.rec+" ₽":"—"}</td><td>${r.selected} ₽</td><td>${pct(r.imu)}</td>
   </tr>`}).join("")
 }
 function reportHead(){
  return state.mode==="reverse"
- ?"<tr><th>РЎС‚СЂР°РЅР°</th><th>Р”РѕСЃС‚Р°РІРєР°</th><th>РџРѕС€Р»РёРЅР°</th><th>RRP</th><th>РњР°РєСЃ. LDP USD</th><th>РњР°РєСЃ. LDP RUB</th><th>РњР°РєСЃ. FOB</th></tr>"
- :"<tr><th>РЎС‚СЂР°РЅР°</th><th>Р”РѕСЃС‚Р°РІРєР°</th><th>РџРѕС€Р»РёРЅР°</th><th>LDP USD</th><th>LDP RUB</th><th>Min RRP</th><th>Р’С‹Р±СЂР°РЅРЅС‹Р№ RRP</th><th>IMU</th></tr>"
+ ?"<tr><th>Страна</th><th>Доставка</th><th>Пошлина</th><th>RRP</th><th>Макс. LDP USD</th><th>Макс. LDP RUB</th><th>Макс. FOB</th></tr>"
+ :"<tr><th>Страна</th><th>Доставка</th><th>Пошлина</th><th>LDP USD</th><th>LDP RUB</th><th>Min RRP</th><th>Выбранный RRP</th><th>IMU</th></tr>"
 }
 function buildReportElement(){
  const text=$("reportModelText").value.trim();
@@ -344,26 +344,26 @@ function buildReportElement(){
  container.innerHTML=`<style>
   .pdf-title{font-size:24px;font-weight:800;margin:0}.pdf-muted{color:#64748b}.pdf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.pdf-kpi{border:1px solid #e2e8f0;border-radius:10px;padding:10px}.pdf-kpi b{display:block;margin-top:4px;font-size:15px}.pdf-model{display:flex;gap:16px;align-items:flex-start;margin:16px 0}.pdf-model img{width:170px;max-height:190px;object-fit:contain;border:1px solid #e2e8f0;border-radius:10px}.pdf-note{white-space:pre-wrap;border:1px solid #e2e8f0;border-radius:10px;padding:12px;background:#f8fafc;flex:1;min-height:76px}.pdf-table{width:100%;border-collapse:collapse;margin-top:18px;font-size:11px}.pdf-table th,.pdf-table td{border:1px solid #e2e8f0;padding:7px;text-align:left;vertical-align:top}.pdf-table th{background:#f1f5f9;font-weight:800}.pdf-footer{margin-top:14px;font-size:10px;color:#64748b}
  </style>
- <h1 class="pdf-title">РћС‚С‡С‘С‚ LDP / RRP / IMU</h1>
- <div class="pdf-muted">РЎС„РѕСЂРјРёСЂРѕРІР°РЅ: ${new Date().toLocaleString("ru-RU")}</div>
+ <h1 class="pdf-title">Отчёт LDP / RRP / IMU</h1>
+ <div class="pdf-muted">Сформирован: ${new Date().toLocaleString("ru-RU")}</div>
  <div class="pdf-grid">
-   <div class="pdf-kpi"><span class="pdf-muted">Р РµР¶РёРј</span><b>${state.mode==="reverse"?"РџРѕ RRP":"РџРѕ FOB"}</b></div>
-   <div class="pdf-kpi"><span class="pdf-muted">${state.mode==="reverse"?"RRP":"FOB"}</span><b>${state.mode==="reverse"?escapeHtml($("reverseRrp").value)+" в‚Ѕ":escapeHtml($("fob").value)+" $"}</b></div>
-   <div class="pdf-kpi"><span class="pdf-muted">Garment Weight</span><b>${escapeHtml($("weight").value)} РєРі</b></div>
-   <div class="pdf-kpi"><span class="pdf-muted">Р¦РµР»РµРІРѕР№ IMU</span><b>${escapeHtml($("targetImu").value)}%</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Режим</span><b>${state.mode==="reverse"?"По RRP":"По FOB"}</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">${state.mode==="reverse"?"RRP":"FOB"}</span><b>${state.mode==="reverse"?escapeHtml($("reverseRrp").value)+" ₽":escapeHtml($("fob").value)+" $"}</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Garment Weight</span><b>${escapeHtml($("weight").value)} кг</b></div>
+   <div class="pdf-kpi"><span class="pdf-muted">Целевой IMU</span><b>${escapeHtml($("targetImu").value)}%</b></div>
  </div>
  ${(text||reportImageData)?`<div class="pdf-model">${reportImageData?`<img src="${reportImageData}" alt="">`:""}${text?`<div class="pdf-note">${escapeHtml(text)}</div>`:""}</div>`:""}
  <table class="pdf-table">
   <thead>${reportHead()}</thead>
   <tbody>${reportRows()}</tbody>
  </table>
- <div class="pdf-footer">Р Р°СЃС‡С‘С‚ СЃС„РѕСЂРјРёСЂРѕРІР°РЅ РєР°Р»СЊРєСѓР»СЏС‚РѕСЂРѕРј LDP / RRP / IMU.</div>`;
+ <div class="pdf-footer">Расчёт сформирован калькулятором LDP / RRP / IMU.</div>`;
  document.body.appendChild(container);
  return container
 }
 async function exportReportPdf(){
  const btn=$("downloadReport"),status=$("reportStatus");
- btn.disabled=true;status.textContent="Р¤РѕСЂРјРёСЂСѓРµРј PDFвЂ¦";
+ btn.disabled=true;status.textContent="Формируем PDF…";
  let report=null;
  try{
   await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js","html2canvas-lib");
@@ -386,11 +386,11 @@ async function exportReportPdf(){
   }
   const stamp=new Date().toISOString().slice(0,10);
   pdf.save(`ldp-rrp-imu-report-${stamp}.pdf`);
-  status.textContent="PDF СЃС„РѕСЂРјРёСЂРѕРІР°РЅ.";
+  status.textContent="PDF сформирован.";
   setTimeout(()=>{$("reportOverlay").classList.remove("show");status.textContent=""},450)
  }catch(err){
   console.error(err);
-  status.textContent="РќРµ СѓРґР°Р»РѕСЃСЊ СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ PDF. РџСЂРѕРІРµСЂСЊС‚Рµ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє РёРЅС‚РµСЂРЅРµС‚Сѓ Рё РїРѕРІС‚РѕСЂРёС‚Рµ."
+  status.textContent="Не удалось сформировать PDF. Проверьте подключение к интернету и повторите."
  }finally{
   if(report)report.remove();
   btn.disabled=false
@@ -409,7 +409,7 @@ $("reportImageInput").onchange=e=>{
 };
 $("downloadReport").onclick=exportReportPdf;
 
-$("reset").onclick=()=>{state.routes={"Р‘Р°РЅРіР»Р°РґРµС€":"bd-land","РљРёС‚Р°Р№":"cn-land","РРЅРґРёСЏ":"in-land","Р’СЊРµС‚РЅР°Рј":"vn-land"};state.dutyOn={"Р‘Р°РЅРіР»Р°РґРµС€":true,"РљРёС‚Р°Р№":true,"РРЅРґРёСЏ":true,"Р’СЊРµС‚РЅР°Рј":false};state.selected={};$("tg").value="KNIT TOPS";$("fob").value="1.99";refreshRrpSuggestions();$("reverseRrp").value="799";$("weight").value="0.095";$("targetImu").value="71.7";refreshRrpSuggestions();setMode("forward")};
+$("reset").onclick=()=>{state.routes={"Бангладеш":"bd-land","Китай":"cn-land","Индия":"in-land","Вьетнам":"vn-land"};state.dutyOn={"Бангладеш":true,"Китай":true,"Индия":true,"Вьетнам":false};state.selected={};$("tg").value="KNIT TOPS";$("fob").value="1.99";refreshRrpSuggestions();$("reverseRrp").value="799";$("weight").value="0.095";$("targetImu").value="71.7";refreshRrpSuggestions();setMode("forward")};
 refreshRrpSuggestions();render();
 </script>
 </body>
